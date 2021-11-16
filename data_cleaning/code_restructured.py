@@ -2,7 +2,7 @@
 
 ## important information on encodings - must read to understand the code below ##
 # Encoding for players: Red 1, Blue 2, Yellow 3, Green 4
-# Encoding of pieces: Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5, King 6
+# Encoding of pieces: Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5, King 6, Promoted Queen 7
 ## ##
 
 # coordinates a-n left to right, 1-14 bottom-up
@@ -89,7 +89,7 @@ def initial_board():
     for c in cols[3:11]:
         b[f"{c}2"] = [1,1]
 
-    return delete_corners(b) # delete obsolete, non-playable fields on the corners
+    return b
 
 # test case: check every piece of every player
 
@@ -99,7 +99,7 @@ def clean_moves(board, moves):
     # # Nj1-i3+, Nj1-i3#, Nj1xi3+#, Nj1-i3+#, j1-i3=Q, O-O, R, S, T
     # replace x with dash and split on -
     cleaned = [moves[i].replace("x", "-").split("-") for i in range(len(moves))]
-    # output: [['e2', 'g1'], ['b4', 'h14'], ['d13', 'd11']...]
+    # output: [['Ne2', 'g1+'], ['b4', 'h14'], ['d13', 'd11']...]
     # print(moves)
     # now delete +, # and =Q
     # go through cleaned, which is a list of lists
@@ -111,12 +111,18 @@ def clean_moves(board, moves):
             cleaned[i] = "dropped"
         else:
             for j in range(len(cleaned[i])):
-                # go through each move eg. ["e2", "e4"]
-                if "dropped" not in moves[i]:
+                # go through each move eg. ["Ne2", "e4#+"]
+                if "dropped" not in cleaned[i]: # does this if statement ever not go through
                     # if it is not "dropped" already
                     cleaned[i][j] = cleaned[i][j].replace("+", "")
                     cleaned[i][j] = cleaned[i][j].replace("#", "")
-                    cleaned[i][j] = cleaned[i][j].replace("=Q", "")
+                    if "=Q" in cleaned[i][j]:
+                        # TODO: promotion of pawn to other pieces as well! Split functions: Update_Board()
+                        # [["a11"], ["a12=Q"],...]
+                        board[cleaned[i][0]][0] = 7
+                        cleaned[i][j] = cleaned[i][j].replace("=Q", "")
+                    # Question: does the pawn move change? e2-e4 => Qe2-e4
+                    # add promoted queen
                     if cleaned[i][j][0].isupper() and cleaned[i][j] != "O": # remove piece name, if no castling
                         cleaned[i][j] = cleaned[i][j][1:]
                     elif cleaned[i] == ["O", "O", "O"] or cleaned[i] == ["O","O"]:
@@ -233,3 +239,26 @@ def perform_castling(board, cleaned_castling_move):
         board["n4"], board["n7"] = [0, 0], [0, 0]
 
     return board
+
+def check_kings(board):
+    dropped = []
+    # check if any kings are not on the board anymore
+    kings = ([6,1], [6,2], [6,3], [6,4])
+    for k in kings:
+        if k not in board.values():
+            dropped.append(k[1])
+            #print(f"The King of player {k[1]} is not on the board anymore. Player {k[1]} dropped out.")
+    return dropped
+
+def mk_move(game):
+    for g in game["data"]:
+        board = initial_board() # construct new board at the beginning of each game
+        print(f"Game #{game['data'].index(g)}") # print game number
+        for r in g["Rounds"]:
+            moves = clean_moves(board, r["Moves"]) # clean moves
+            # sample output: [["e2", "e4"], ["g14", "i14"] (qside castling move), ...]
+            # no move has been made until now, also not castling
+            if "dropped" in moves:
+                continue
+            times = r["Times"]
+
