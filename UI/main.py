@@ -1,13 +1,14 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QInputDialog
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
+
 
 
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -82,19 +83,30 @@ class Ui_MainWindow(object):
         dlg = ConfirmDialog(p1,p2,p3,self.userColor)
         if dlg.exec():
             print("Success!")
-            self.hidingContent(self.player1, self.player2, self.player3, self.comboBox, self.label, self.label2,
-                               self.label_3, self.label_4, self.pushButton)
+
             self.window2()
         else:
             print("Cancel!")
 
+    # self.hidingContent(self.comboBox, self.label, self.label2,
+    #                    self.label_3, self.label_4, self.pushButton)
+    #
+    # def hidingContent(self, *args):
+    #     for i in args:
+    #         i.hide()
 
-
-    def hidingContent(self, *args):
-        for i in args:
-            i.hide()
+    def opponentsColor(self):
+        #if confirm then make the colors.
+        self.colors = ["Yellow", "Red", "Green", "Blue"]
+        self.colors.remove(self.userColor)
+        print(self.colors)
+        self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
+        self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
+        self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def window2(self):
+
+        self.historyOfMoves = ""
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         MainWindow.setWindowTitle("4-player Chess predictor")
         self.centralwidget.setObjectName("centralwidget")
@@ -117,47 +129,127 @@ class Ui_MainWindow(object):
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(630, 410, 131, 41))
         self.pushButton_2.setText("changeHistory")
+        self.pushButton_2.clicked.connect(self.changedH)
 
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(630, 510, 131, 41))
         self.pushButton_3.setText("predict")
+        self.pushButton_3.clicked.connect(self.predictButton)
 
         self.tableView = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView.setGeometry(QtCore.QRect(40, 50, 201, 192))
-        self.tableView.setObjectName("tableView")
+        self.tableView.setGeometry(QtCore.QRect(40, 50, 201, 100))
+        self.tableView.setObjectName("player1")
         self.tableView.setDisabled(True)
 
         self.tableView_2 = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView_2.setGeometry(QtCore.QRect(290, 50, 201, 192))
-        self.tableView_2.setObjectName("tableView_2")
+        self.tableView_2.setGeometry(QtCore.QRect(290, 50, 201, 100))
+        self.tableView_2.setObjectName("player2")
         self.tableView_2.setDisabled(True)
 
         self.tableView_3 = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView_3.setGeometry(QtCore.QRect(540, 50, 201, 192))
-        self.tableView_3.setObjectName("tableView_3")
+        self.tableView_3.setGeometry(QtCore.QRect(540, 50, 201, 100))
+        self.tableView_3.setObjectName("player3")
         self.tableView_3.setDisabled(True)
+
+        self.label_2 = QtWidgets.QLabel(self.centralwidget)
+        self.label_2.setGeometry(QtCore.QRect(120, 160, 47, 13))
+        self.label_2.setObjectName("label_2")
+        self.label_2.setText(self.player1.text().capitalize())
+
+        self.label_3 = QtWidgets.QLabel(self.centralwidget)
+        self.label_3.setGeometry(QtCore.QRect(120, 180, 47, 13))
+        self.label_3.setObjectName("label_3")
+        self.label_3.setText(self.player2.text().capitalize())
+
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(120, 200, 47, 13))
+        self.label_4.setObjectName("label_4")
+        self.label_4.setText(self.player3.text().capitalize())
+
+        self.label_5 = QtWidgets.QLabel(self.centralwidget)
+        self.label_5.setGeometry(QtCore.QRect(370, 160, 47, 13))
+        self.label_5.setObjectName("label_5")
+        self.label_5.setText(self.player1.text().capitalize())
+
+        self.label_6 = QtWidgets.QLabel(self.centralwidget)
+        self.label_6.setGeometry(QtCore.QRect(370, 180, 47, 13))
+        self.label_6.setObjectName("label_6")
+        self.label_6.setText(self.player2.text().capitalize())
+
+        self.label_7 = QtWidgets.QLabel(self.centralwidget)
+        self.label_7.setGeometry(QtCore.QRect(370, 200, 47, 13))
+        self.label_7.setObjectName("label_7")
+        self.label_7.setText(self.player3.text().capitalize())
+
+        self.label_8 = QtWidgets.QLabel(self.centralwidget)
+        self.label_8.setGeometry(QtCore.QRect(620, 160, 47, 13))
+        self.label_8.setObjectName("label_8")
+        self.label_8.setText(self.player1.text().capitalize())
+
+        self.label_9 = QtWidgets.QLabel(self.centralwidget)
+        self.label_9.setGeometry(QtCore.QRect(620, 180, 47, 13))
+        self.label_9.setObjectName("label_9")
+        self.label_9.setText(self.player2.text().capitalize())
+
+        self.label_10 = QtWidgets.QLabel(self.centralwidget)
+        self.label_10.setGeometry(QtCore.QRect(620, 200, 47, 13))
+        self.label_10.setObjectName("label_10")
+        self.label_10.setText(self.player3.text().capitalize())
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
+
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.opponentsColor()
 
-    def addMoves(self, moves):
-        print(self.lineEdit1.text())
-        self.historyText.setText(self.lineEdit1.text())
+    def addMoves(self):
+        #check that he added the right format, otherwise send something back or change the format?
 
-    def opponentsColor(self):
-        #if confirm then make the colors.
-        colors = ["yellow", "red", "green", "blue"]
-        colors.remove(self.userColor)
-        self.tableView.setStyleSheet("background-color:#ff0000;")
-        self.tableView_2.setStyleSheet("background-color:#ff0000;")
-        self.tableView_3.setStyleSheet("background-color:#ff0000;")
+        #print(self.lineEdit1.text())
+        self.historyOfMoves += (self.lineEdit1.text())
+        #print(self.historyOfMoves)
+        self.historyText.setText(self.historyOfMoves)
+        self.lineEdit1.clear()
+
+    def changedH(self):
+        if self.pushButton_2.text() == "confirm changes":
+            self.historyText.setDisabled(True)
+            #print(self.historyText.toPlainText())
+
+            self.historyOfMoves = self.historyText.toPlainText()
+            self.pushButton_2.setText("Change history")
+        else:
+            self.pushButton_2.setText("confirm changes")
+            #print(self.pushButton_2.text())
+            self.historyText.setDisabled(False)
+
+
+
+    def predictButton(self):
+        import random
+        print(self.player1)
+        #p1 = self.player1.text()
+        #p2 = self.player2.text()
+        #p3 = self.player3.text()
+        #players = [p1,p2,p3]
+        print("predictbutton")
+        # self.label_2.setText(players[0]) #first color player
+        # self.label_3.setText(players[1])
+        # self.label_4.setText(players[2])
+        # self.label_5.setText(players[0])# second color
+        # self.label_6.setText(players[1])
+        # self.label_7.setText(players[2])
+        # self.label_8.setText(players[0]) # third color
+        # self.label_9.setText(players[1])
+        # self.label_10.setText(players[2])
+
+
 
 
 
@@ -172,6 +264,7 @@ class ConfirmDialog(QDialog):
         super().__init__(parent)
         QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
         self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
+
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
 
@@ -181,6 +274,8 @@ class ConfirmDialog(QDialog):
         self.layout.addWidget(message)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
+
+
 
 if __name__ == "__main__":
     import sys
