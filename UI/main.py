@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
         self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def window2(self):
-
+        self.opponents = [self.player1.text(), self.player2.text(), self.player3.text()]
         self.historyOfMoves = ""
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         MainWindow.setWindowTitle("4-player Chess predictor")
@@ -233,21 +233,22 @@ class Ui_MainWindow(object):
 
     def predictButton(self):
         import random
-        print(self.player1)
-        #p1 = self.player1.text()
-        #p2 = self.player2.text()
-        #p3 = self.player3.text()
-        #players = [p1,p2,p3]
+
+        print(self.opponents)
+        random.shuffle(self.opponents)
+        print(self.opponents)
+
         print("predictbutton")
-        # self.label_2.setText(players[0]) #first color player
-        # self.label_3.setText(players[1])
-        # self.label_4.setText(players[2])
-        # self.label_5.setText(players[0])# second color
-        # self.label_6.setText(players[1])
-        # self.label_7.setText(players[2])
-        # self.label_8.setText(players[0]) # third color
-        # self.label_9.setText(players[1])
-        # self.label_10.setText(players[2])
+        self.label_2.setText(self.opponents[0]) #first color player
+        self.label_3.setText(self.opponents[1])
+        self.label_4.setText(self.opponents[2])
+        self.label_5.setText(self.opponents[0])# second color
+        self.label_6.setText(self.opponents[1])
+        self.label_7.setText(self.opponents[2])
+        self.label_8.setText(self.opponents[0]) # third color
+        self.label_9.setText(self.opponents[1])
+        self.label_10.setText(self.opponents[2])
+
 
 
 
