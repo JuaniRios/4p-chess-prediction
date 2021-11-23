@@ -296,6 +296,8 @@ def mk_move(game):
             g["dropped_players"] += list(set(g["active_players"]) - set(currently_active_players))
             # remove duplicates
             g["dropped_players"] = list(set(g["dropped_players"]))
+            # sort dropped players list for correct insertion of placeholders
+            g["dropped_players"].sort()
             # update active players list
             g["active_players"] = currently_active_players
 
@@ -314,7 +316,7 @@ def mk_move(game):
             #print("Dropped players")
             #print(g["dropped_players"])
             #print(g["Rounds"])
-    return board
+    return game
 
 import json
 
@@ -326,3 +328,7 @@ data = json.load(f)
 data = add_dropped_active(data)
 #print(data["data"][0])
 mk_move(data)
+
+# write output to json file "algorithm_output.json
+#with open('algorithm_output.json','w') as output :
+#    json.dump(data,output)
