@@ -143,7 +143,17 @@ def clean_moves(board, moves, active_players):
         else:
             cleaned = [move for move in cleaned if move != ["R"]]
     if ["S"] in cleaned:
-        cleaned = [move for move in cleaned if move != ["S"]]
+        player_nr = active_players[cleaned.index(["S"])] # get which player had timeout
+        if [6, player_nr] in board.values():
+
+            king_position = [key for key,value in board.items() if value == [6, player_nr]] # store the player's king
+            # position
+            # now take the king and do not move it, as it might move randomly in the next rounds. Timeouts do not
+            # necessarily mean that a player drops out immediately. His/her king might still move around randomly although
+            # being dead.
+            cleaned = [[king_position[0], king_position[0]] if move == ["S"] else move for move in cleaned]
+        else:
+            cleaned = [move for move in cleaned if move != ["S"]]
     # in game nr 12243 there is a move called RS
     if ["RS"] in cleaned:
         cleaned = [move for move in cleaned if move != ["RS"]]
@@ -330,5 +340,5 @@ data = add_dropped_active(data)
 mk_move(data)
 
 # write output to json file "algorithm_output.json
-#with open('algorithm_output.json','w') as output :
+#with open('algorithm_output_testS.json','w') as output :
 #    json.dump(data,output)
