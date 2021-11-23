@@ -299,13 +299,21 @@ def mk_move(game):
             # update active players list
             g["active_players"] = currently_active_players
 
-            # print board for the CNN
-            # print(board)
+            # here we insert empty strings at the place of the dropped player
+            # also at times we insert a placeholder value of 0
+            if len(g["dropped_players"]) > 0:
+                for p in g["dropped_players"]:
+                    r["Moves"].insert(p-1, "") # insert at index player number (1,2,3,4) - 1 (0,1,2,3)
+                    r["Times"].insert(p-1, 0)
 
-            print("Active players")
-            print(g["active_players"])
-            print("Dropped players")
-            print(g["dropped_players"])
+            # print board for the CNN
+            #print(board)
+
+            #print("Active players")
+            #print(g["active_players"])
+            #print("Dropped players")
+            #print(g["dropped_players"])
+            #print(g["Rounds"])
     return board
 
 import json
@@ -315,29 +323,6 @@ f = open("../solo_pretty.json")
 data = json.load(f)
 # print(len(data["data"])) # 16625
 
-
-# test with some test data
-#data = {"data": [{"GameNr": "673575", "Variant": "FFA", "RuleVariants": "PromoteTo=D", "Result": "pitifloo: 20 - Bill13Cooper: 47 - rook6431: 42 - dimonchi73: 0", "Termination": "Game over. (Yellow +20)", "Red": "pitifloo", "RedElo": "1912", "Blue": "Bill13Cooper", "BlueElo": "1878", "Yellow": "rook6431", "YellowElo": "2028", "Green": "dimonchi73", "GreenElo": "1854", "TimeControl": "1+15D", "Site": "www.chess.com/4-player-chess", "Date": "Thu Dec 27 2018 01:20:05 GMT+0000 (UTC)", "Rounds":
-#    [{"Moves": ["j2-j3", "e2-e4", "h13-h11", "m10-l10"], "Times": [0, 5, 6, 5], "Number": 1}, {"Moves": ["Nj1-i3", "Kb4-d4", "Qh11-a8", "Bn9-m10"], "Times": [20, 8, 2, 11], "Number": 2}, {"Moves": ["Kd4-d6", "Qh14-a11", "Bm10-n11"], "Times": [20, 8, 2, 11], "Number": 2}]}]}
 data = add_dropped_active(data)
 #print(data["data"][0])
 mk_move(data)
-#print(data["data"][0])
-# look fine on test data
-
-# 1) check which kings are still on the board - problem: resignations, timeouts...
-# 2) check which king is being dropped from the field - problem: track every move exactly, cumbersome
-# 3) check which player has not moved - problem: indexing (maybe solveable by active players list)
-# if len(moves) < len(active_players):
-# compare previous board state with current one after moves were made
-# see which player's remaining pieces are the same as previously
-
-# clean up moves, except RTS and castling
-# implement castling & pawn promotion (for castling i need dropped players working)
-# store board state of each round for each player
-# compare board states of previous round to now and see which pieces did not move
-# positions = [field for field,move in board if move[1] == 1 --> get all fields a red piece is occupying
-# compare those and see which player has not moved
-# add dropped players to a list
-# do not insert anything, do not edit original data except for those lists mentioned above
-# return board after each round
