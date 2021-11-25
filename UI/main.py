@@ -231,45 +231,54 @@ class Ui_MainWindow(object):
         if re.match(r'[a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} [a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} '
                     r'[a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} [a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} {0,1}$', self.lineEdit1.text()):
             #the last is for a space?!
+            print(self.movesListForPrediction, "before add")
             self.movesListForPrediction.append([self.lineEdit1.text()])
+            print(self.movesListForPrediction, "after add")
             # maybe here and or to include the players dropping with a 0?
 
             for i in self.movesListForPrediction:
                 self.historyOfMoves += "".join(i)
-                self.historyOfMoves += ", "
+                self.historyOfMoves += ","
 
             self.historyText.setText(self.historyOfMoves)
-            #setting the historyofMoves string to empty because we are using from the list each time to string.
+            # setting the historyofMoves string to empty because we are using from the list each time to string.
             self.historyOfMoves = ""
+
         #have to clear the labelwindow
         self.lineEdit1.clear()
-        print(self.movesListForPrediction) # this list is for Henrik
+        #print(self.movesListForPrediction) # this list is for Henrik
 
     def changedH(self):
         """This is when the user would like to correct the history of moves"""
         if self.pushButton_2.text() == "confirm changes":
             self.historyText.setDisabled(True)
-            #print(self.historyText.toPlainText())
 
-
-            print(self.movesListForPrediction)
             self.historyOfMoves = self.historyText.toPlainText()
-
-            nanna = self.historyOfMoves.split(", ")
-            print(nanna)
+            splittingData = self.historyOfMoves.split(",")
             newList = []
-            for word in nanna:
-                word = word.split(",")
-                newList.append(word)
-            print(newList)
+            # accessing each round and making a new list.
+            for w in splittingData:
+                list1 = w.split(",")
+                newList.append(list1)
+
+            self.movesListForPrediction = newList
+            self.historyOfMoves = ""
 
             self.pushButton_2.setText("Change history")
+            #deleting the comma!
+            if self.movesListForPrediction[-1] == [""]:
+                self.movesListForPrediction.pop(-1)
+
+            print(self.movesListForPrediction, "after changing history")
+
+
+
         else:
             self.pushButton_2.setText("confirm changes")
             #print(self.pushButton_2.text())
             self.historyText.setDisabled(False)
 
-
+            #only problem now is that if he doesnt add manually, he has a comma.
 
     def predictButton(self):
         """For now this predictbutton is only simulation random prediction. Wants to add the percentage and add the code when ready"""
