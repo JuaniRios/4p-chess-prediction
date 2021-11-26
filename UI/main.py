@@ -228,8 +228,8 @@ class Ui_MainWindow(object):
         missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
 
         #Using regex to get the right format.
-        if re.match(r'[a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} [a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} '
-                    r'[a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} [a-zA-Z]{1,2}[0-9]{1,2}-[a-zA-Z]{1,2}[0-9]{1,2} {0,1}$', self.lineEdit1.text()):
+        move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
+        if re.match(f'{move} {move} {move} {move}', self.lineEdit1.text()):
             #the last is for a space?!
             print(self.movesListForPrediction, "before add")
             self.movesListForPrediction.append([self.lineEdit1.text()])
@@ -266,8 +266,10 @@ class Ui_MainWindow(object):
 
             self.pushButton_2.setText("Change history")
             #deleting the comma!
-            if self.movesListForPrediction[-1] == [""]:
-                self.movesListForPrediction.pop(-1)
+            for i in range(len(self.movesListForPrediction)):
+                if self.movesListForPrediction[i] == [""]:
+                    self.movesListForPrediction.pop(i)
+
 
             print(self.movesListForPrediction, "after changing history")
 
