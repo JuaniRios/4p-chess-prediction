@@ -6,6 +6,7 @@ import re
 
 
 class Ui_MainWindow(object):
+    """First window"""
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -77,7 +78,7 @@ class Ui_MainWindow(object):
 
 
 
-
+    #MAYBE MAKE A DROP DOWN WITH ALL PLAYERS AVAILABLE?
 
     def getInfoAboutGame(self, i):
         """This functions takes the input about each player to later add them to the training model."""
@@ -89,15 +90,58 @@ class Ui_MainWindow(object):
         print(self.player1.text())
         print(self.player2.text())
         print(self.player3.text())
+        self.opponents = [p1, p2, p3]
+        if self.checkExistingPlayers(self.opponents):
+            dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
+            if dlg.exec():
+                print("Success!")
 
-        dlg = ConfirmDialog(p1,p2,p3,self.userColor)
-        if dlg.exec():
-            print("Success!")
-            self.opponents = [p1,p2,p3]
-
-            self.window2()
+                self.window2()
+            else:
+                print("Cancel!")
         else:
-            print("Cancel!")
+            print("Sorry dude!!")
+            #here I need to pop up a window saying something went wrong, either some players are not in the data.
+
+
+    def checkExistingPlayers(self, args):
+        """Here we go through the data to see if players are in, we need all three so perform the algorithm"""
+        with open('top100players_ffa.txt') as f1:
+            teams = f1.read().splitlines()
+
+        with open('top100players_solo.txt') as f2:
+            solo = f2.read().splitlines()
+
+        #adding both lists
+        listOfPlayersAvailable = teams + solo
+        # to delete duplicates
+        listOfPlayersAvailable = list(dict.fromkeys(listOfPlayersAvailable))
+
+        #players inserted
+        players = [*args]
+        count = 0
+        for i in listOfPlayersAvailable:
+            if players[0] == i:
+                count += 1
+            elif players[1] == i:
+                count += 1
+            elif players[2] == i:
+                count += 1
+        #if we find all three players in the data we return true
+        if count == 3:
+            return True
+        return False
+
+
+
+        # dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
+        # if dlg.exec():
+        #     print("Success!")
+        #
+        #
+        #     self.window2()
+        # else:
+        #     print("Cancel!")
 
     # self.hidingContent(self.comboBox, self.label, self.label2,
     #                    self.label_3, self.label_4, self.pushButton)
@@ -118,7 +162,7 @@ class Ui_MainWindow(object):
 
     def window2(self):
         """Creating the window for adding moves and prediction """
-        print(self.opponents)
+        print(self.opponents, "checking if players are coming into window")
         self.historyOfMoves = ""
         self.movesListForPrediction = []
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -265,7 +309,7 @@ class Ui_MainWindow(object):
             self.historyOfMoves = ""
 
             self.pushButton_2.setText("Change history")
-            #deleting the comma!
+            #deleting any comma which may be there.
             for i in range(len(self.movesListForPrediction)):
                 if self.movesListForPrediction[i] == [""]:
                     self.movesListForPrediction.pop(i)
