@@ -67,18 +67,6 @@ class Ui_MainWindow(object):
         for i in self.addPlayer():
             self.player3.addItem(i)
 
-        # self.player1 = QtWidgets.QLineEdit(self.centralwidget)
-        # self.player1.setGeometry(QtCore.QRect(110, 60, 113, 20))
-        # self.player1.setObjectName("p1")
-        #
-        # self.player2 = QtWidgets.QLineEdit(self.centralwidget)
-        # self.player2.setGeometry(QtCore.QRect(110, 130, 113, 20))
-        # self.player2.setObjectName("p2")
-        #
-        # self.player3 = QtWidgets.QLineEdit(self.centralwidget)
-        # self.player3.setGeometry(QtCore.QRect(110, 200, 113, 20))
-        # self.player3.setObjectName("p3")
-
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 21))
@@ -103,9 +91,6 @@ class Ui_MainWindow(object):
         p1 = self.player1.currentText()
         p2 = self.player2.currentText()
         p3 = self.player3.currentText()
-        print(self.player1.currentText())
-        print(self.player2.currentText())
-        print(self.player3.currentText())
         self.opponents = [p1, p2, p3]
 
 
@@ -139,7 +124,6 @@ class Ui_MainWindow(object):
         #if confirm then make the colors.
         self.colors = ["Red", "Blue", "Yellow", "Green"]
         self.colors.remove(self.userColor)
-        print(self.colors, "color")
         self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
         self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
         self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
@@ -317,7 +301,8 @@ class Ui_MainWindow(object):
             #only problem now is that if he doesnt add manually, he has a comma.
 
     def predictButton(self):
-        """For now this predictbutton is only simulation random prediction. Wants to add the percentage and add the code when ready"""
+        """For now this predictbutton is only simulation random prediction.
+        Wants to add the percentage and add the code when ready"""
         import random
 
 
