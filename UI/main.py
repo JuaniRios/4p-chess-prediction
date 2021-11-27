@@ -43,23 +43,41 @@ class Ui_MainWindow(object):
 
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setGeometry(QtCore.QRect(660, 80, 69, 22))
-        self.comboBox.setObjectName("comboBox")
+        self.comboBox.setObjectName("comboBoxColor")
         self.comboBox.addItem("Red")
         self.comboBox.addItem("Blue")
         self.comboBox.addItem("Yellow")
         self.comboBox.addItem("Green")
 
-        self.player1 = QtWidgets.QLineEdit(self.centralwidget)
+        self.player1 = QtWidgets.QComboBox(self.centralwidget)
         self.player1.setGeometry(QtCore.QRect(110, 60, 113, 20))
-        self.player1.setObjectName("p1")
+        self.player1.setObjectName("player1")
+        for i in self.addPlayer():
+            self.player1.addItem(i)
 
-        self.player2 = QtWidgets.QLineEdit(self.centralwidget)
+        self.player2 = QtWidgets.QComboBox(self.centralwidget)
         self.player2.setGeometry(QtCore.QRect(110, 130, 113, 20))
-        self.player2.setObjectName("p2")
+        self.player2.setObjectName("player1")
+        for i in self.addPlayer():
+            self.player2.addItem(i)
 
-        self.player3 = QtWidgets.QLineEdit(self.centralwidget)
+        self.player3 = QtWidgets.QComboBox(self.centralwidget)
         self.player3.setGeometry(QtCore.QRect(110, 200, 113, 20))
-        self.player3.setObjectName("p3")
+        self.player3.setObjectName("player1")
+        for i in self.addPlayer():
+            self.player3.addItem(i)
+
+        # self.player1 = QtWidgets.QLineEdit(self.centralwidget)
+        # self.player1.setGeometry(QtCore.QRect(110, 60, 113, 20))
+        # self.player1.setObjectName("p1")
+        #
+        # self.player2 = QtWidgets.QLineEdit(self.centralwidget)
+        # self.player2.setGeometry(QtCore.QRect(110, 130, 113, 20))
+        # self.player2.setObjectName("p2")
+        #
+        # self.player3 = QtWidgets.QLineEdit(self.centralwidget)
+        # self.player3.setGeometry(QtCore.QRect(110, 200, 113, 20))
+        # self.player3.setObjectName("p3")
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -78,84 +96,50 @@ class Ui_MainWindow(object):
 
 
 
-    #MAYBE MAKE A DROP DOWN WITH ALL PLAYERS AVAILABLE?
-
     def getInfoAboutGame(self, i):
         """This functions takes the input about each player to later add them to the training model."""
         self.userColor=self.comboBox.currentText()
         print(self.comboBox.currentText())
-        p1 = self.player1.text()
-        p2 = self.player2.text()
-        p3 = self.player3.text()
-        print(self.player1.text())
-        print(self.player2.text())
-        print(self.player3.text())
+        p1 = self.player1.currentText()
+        p2 = self.player2.currentText()
+        p3 = self.player3.currentText()
+        print(self.player1.currentText())
+        print(self.player2.currentText())
+        print(self.player3.currentText())
         self.opponents = [p1, p2, p3]
-        if self.checkExistingPlayers(self.opponents):
-            dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
-            if dlg.exec():
-                print("Success!")
 
-                self.window2()
-            else:
-                print("Cancel!")
+
+        dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
+        if dlg.exec():
+            print("Success!")
+            self.window2()
         else:
-            print("Sorry dude!!")
-            #here I need to pop up a window saying something went wrong, either some players are not in the data.
+            print("Cancel!")
 
 
-    def checkExistingPlayers(self, args):
-        """Here we go through the data to see if players are in, we need all three so perform the algorithm"""
+    def addPlayer(self): # have to fix that he cant add the same player three times.
+        """A function to check what players we have data about to put them into a drop down menu"""
+
         with open('top100players_ffa.txt') as f1:
             teams = f1.read().splitlines()
 
         with open('top100players_solo.txt') as f2:
             solo = f2.read().splitlines()
 
-        #adding both lists
+        # adding both lists
         listOfPlayersAvailable = teams + solo
         # to delete duplicates
         listOfPlayersAvailable = list(dict.fromkeys(listOfPlayersAvailable))
 
-        #players inserted
-        players = [*args]
-        count = 0
-        for i in listOfPlayersAvailable:
-            if players[0] == i:
-                count += 1
-            elif players[1] == i:
-                count += 1
-            elif players[2] == i:
-                count += 1
-        #if we find all three players in the data we return true
-        if count == 3:
-            return True
-        return False
+        return listOfPlayersAvailable
 
-
-
-        # dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
-        # if dlg.exec():
-        #     print("Success!")
-        #
-        #
-        #     self.window2()
-        # else:
-        #     print("Cancel!")
-
-    # self.hidingContent(self.comboBox, self.label, self.label2,
-    #                    self.label_3, self.label_4, self.pushButton)
-    #
-    # def hidingContent(self, *args):
-    #     for i in args:
-    #         i.hide()
 
     def opponentsColor(self):
         """This functions sets the color on the board so vizualize for the user where his opponoent are"""
         #if confirm then make the colors.
         self.colors = ["Red", "Blue", "Yellow", "Green"]
         self.colors.remove(self.userColor)
-        print(self.colors)
+        print(self.colors, "color")
         self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
         self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
         self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
@@ -163,6 +147,7 @@ class Ui_MainWindow(object):
     def window2(self):
         """Creating the window for adding moves and prediction """
         print(self.opponents, "checking if players are coming into window")
+        print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
         self.historyOfMoves = ""
         self.movesListForPrediction = []
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -212,47 +197,56 @@ class Ui_MainWindow(object):
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(120, 160, 47, 13))
         self.label_2.setObjectName("label_2")
-        self.label_2.setText(self.player1.text().capitalize())
+        self.label_2.setText(self.player1.currentText().capitalize())
+        self.label_2.adjustSize()
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(120, 180, 47, 13))
         self.label_3.setObjectName("label_3")
-        self.label_3.setText(self.player2.text().capitalize())
+        self.label_3.setText(self.player2.currentText().capitalize())
+        self.label_3.adjustSize()
 
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(120, 200, 47, 13))
         self.label_4.setObjectName("label_4")
-        self.label_4.setText(self.player3.text().capitalize())
+        self.label_4.setText(self.player3.currentText().capitalize())
+        self.label_4.adjustSize()
 
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(370, 160, 47, 13))
         self.label_5.setObjectName("label_5")
-        self.label_5.setText(self.player1.text().capitalize())
+        self.label_5.setText(self.player1.currentText().capitalize())
+        self.label_5.adjustSize()
 
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(370, 180, 47, 13))
         self.label_6.setObjectName("label_6")
-        self.label_6.setText(self.player2.text().capitalize())
+        self.label_6.setText(self.player2.currentText().capitalize())
+        self.label_6.adjustSize()
 
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(370, 200, 47, 13))
         self.label_7.setObjectName("label_7")
-        self.label_7.setText(self.player3.text())
+        self.label_7.setText(self.player3.currentText())
+        self.label_7.adjustSize()
 
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(620, 160, 47, 13))
         self.label_8.setObjectName("label_8")
-        self.label_8.setText(self.player1.text())
+        self.label_8.setText(self.player1.currentText())
+        self.label_8.adjustSize()
 
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
         self.label_9.setGeometry(QtCore.QRect(620, 180, 47, 13))
         self.label_9.setObjectName("label_9")
-        self.label_9.setText(self.player2.text())
+        self.label_9.setText(self.player2.currentText())
+        self.label_9.adjustSize()
 
         self.label_10 = QtWidgets.QLabel(self.centralwidget)
         self.label_10.setGeometry(QtCore.QRect(620, 200, 47, 13))
         self.label_10.setObjectName("label_10")
-        self.label_10.setText(self.player3.text())
+        self.label_10.setText(self.player3.currentText())
+        self.label_10.adjustSize()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -314,11 +308,7 @@ class Ui_MainWindow(object):
                 if self.movesListForPrediction[i] == [""]:
                     self.movesListForPrediction.pop(i)
 
-
             print(self.movesListForPrediction, "after changing history")
-
-
-
         else:
             self.pushButton_2.setText("confirm changes")
             #print(self.pushButton_2.text())
@@ -345,12 +335,11 @@ class Ui_MainWindow(object):
         self.label_8.setText(self.opponents[0]) # third color
         self.label_9.setText(self.opponents[1])
         self.label_10.setText(self.opponents[2])
+        listOfLabelsOfPlayers = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
+                                 self.label_8, self.label_9, self.label_10]
+        for i in listOfLabelsOfPlayers:
+            i.adjustSize()
         # here we also know the order of colors, so we can add the labels accordingly
-
-
-
-
-
 
 
 
