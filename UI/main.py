@@ -276,20 +276,27 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.opponentsColor()
-    #DANIEL
+
     def addMoves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
         The user has to add the right format example: 'Qa1-a2 a1-a2 a1-a2 a1-a2' or when a player is
         missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
 
-        #Using regex to get the right format.
-        move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
-        if re.match(f'{move} {move} {move} {move}', self.lineEdit1.text()):
-            #the last is for a space?! we can have whatever in between them, FIX!!! can add whatever after
-            print(self.movesListForPrediction, "before add")
-            self.movesListForPrediction.append([self.lineEdit1.text()])
-            print(self.movesListForPrediction, "after add")
+        # Using regex to get the right format.
+        # move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
+        moves = r"((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2}(=[A-Z])?)|O-O|O-O-O|0)(\s|,\s?)){3}((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2})(=[A-Z])?|O-O|O-O-O)|0)"
+        # this regex accepts one or zero big character followed by exactly one small character, 1 or 2 digits, a dash or an x
+        # followed by again 0 or 1 big character, exactly one small character, 1 or 2 digits, 0 or 1 =[A-Z] for pawn promotion
+        # OR the castling moves OR a 0. This group represents the possible moves and
+        # is followed by either exactly one space, or a comma with an optional space.
+        # This group is being repeated 3 times. The whole group is then repeated
+        # again but without the space or the comma in the end.
 
+        if re.fullmatch(f'{moves}', self.lineEdit1.text()):
+            print(self.movesListForPrediction, "before add")
+            self.movesListForPrediction.append([self.lineEdit1.text().replace(", ", " ").replace(",", " ")])
+            print(self.movesListForPrediction, "after add")
+            # maybe here and or to include the players dropping with a 0?
 
             for i in self.movesListForPrediction:
                 self.historyOfMoves += "".join(i)
@@ -337,6 +344,7 @@ class Ui_MainWindow(object):
             self.pushButton_2.setText("confirm changes")
             #print(self.pushButton_2.text())
             self.historyText.setDisabled(False)
+
 
 
 
