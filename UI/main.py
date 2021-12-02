@@ -7,7 +7,9 @@ import re
 
 
 class Ui_MainWindow(object):
-    """First window"""
+    """
+    Making the first window to the user, where he inserts the name of the players and which color he is using.
+    """
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -79,10 +81,15 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
 
-    def getInfoAboutGame(self, i):
-        """This functions takes the input about each player to later add them to the training model."""
-        self.userColor=self.comboBox.currentText()
+    def getInfoAboutGame(self):
+        """
+        Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
+        :return:
+        """
+        #getting the color inserted of the user
+        self.userColor = self.comboBox.currentText()
 
+        #getting each player and appending it to a list.
         p1 = self.player1.text()
         p2 = self.player2.text()
         p3 = self.player3.text()
@@ -100,7 +107,12 @@ class Ui_MainWindow(object):
 
 
     def addPlayer(self): # have to fix that he cant add the same player three times.
-        """A function to check what players we have data about to put them into a drop down menu"""
+        """
+        Add player is a function which takes the top 100 players of team and solo and concatenate them into a bigger
+        list. It only accepts one name once in case a player plays both. Then we are sending the list to the input
+        field for the user to select players.
+        :return: a list of all available players
+        """
 
         with open('top100players_ffa.txt') as f1:
             teams = f1.read().splitlines()
@@ -112,24 +124,34 @@ class Ui_MainWindow(object):
         listOfPlayersAvailable = teams + solo
         # to delete duplicates
         listOfPlayersAvailable = list(dict.fromkeys(listOfPlayersAvailable))
-        #listOfPlayersAvailable = QCompleter(listOfPlayersAvailable)
-        # sorting the players alphabetically
-        #listOfPlayersAvailable = sorted(listOfPlayersAvailable, key=str.capitalize)
+
 
         return listOfPlayersAvailable
 
 
     def opponentsColor(self):
-        """This functions sets the color on the board so vizualize for the user where his opponoent are"""
+        """
+        This function takes in what color the user has inserted and changes the colors displayed on window 2 later,
+        to understand better which player is which.
+
+        """
+
         #if confirm then make the colors.
         self.colors = ["Red", "Blue", "Yellow", "Green"]
+        # deleting the color the user has inserted to set the style with the other.
         self.colors.remove(self.userColor)
         self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
         self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
         self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def window2(self):
-        """Creating the window for adding moves and prediction """
+        """
+        This is the window to add moves and start prediction, which will be the main window after the user inserted
+        the value needed. Here we have all labels for players being predicted as well as adding moves or changing
+        the history of moves.
+
+        """
+
         print(self.opponents, "checking if players are coming into window")
         #print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
         self.historyOfMoves = ""
@@ -153,7 +175,9 @@ class Ui_MainWindow(object):
         self.tableView_3.setObjectName("player3")
         self.tableView_3.setDisabled(True)
 
-        #LABEL 2-10 is labels for later showing the predicted
+        #LABEL 2-10 is labels for later showing the predicted players and adding the percentage
+
+        #THE PREDICTION OF THE FIRST PLAYER
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(120, 140, 47, 13))
         self.label_2.setObjectName("label_2")
@@ -163,25 +187,26 @@ class Ui_MainWindow(object):
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(120, 160, 47, 13))
         self.label_3.setObjectName("label_3")
-        self.label_3.setText(self.player2.text().capitalize())
+        self.label_3.setText(self.player2.text())
         self.label_3.adjustSize()
 
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
         self.label_4.setGeometry(QtCore.QRect(120, 180, 47, 13))
         self.label_4.setObjectName("label_4")
-        self.label_4.setText(self.player3.text().capitalize())
+        self.label_4.setText(self.player3.text())
         self.label_4.adjustSize()
 
+        #THE PREDICTION OF THE SECOND PLAYER
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(370, 140, 47, 13))
         self.label_5.setObjectName("label_5")
-        self.label_5.setText(self.player1.text().capitalize())
+        self.label_5.setText(self.player1.text())
         self.label_5.adjustSize()
 
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
         self.label_6.setGeometry(QtCore.QRect(370, 160, 47, 13))
         self.label_6.setObjectName("label_6")
-        self.label_6.setText(self.player2.text().capitalize())
+        self.label_6.setText(self.player2.text())
         self.label_6.adjustSize()
 
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
@@ -190,6 +215,7 @@ class Ui_MainWindow(object):
         self.label_7.setText(self.player3.text())
         self.label_7.adjustSize()
 
+        #THE PREDICTION OF THE THIRD PLAYER
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(620, 140, 47, 13))
         self.label_8.setObjectName("label_8")
@@ -278,7 +304,14 @@ class Ui_MainWindow(object):
         #print(self.movesListForPrediction) # this list is for Henrik
 
     def changedH(self):
-        """This is when the user would like to correct the history of moves"""
+        """
+        This function is used when the player wants to change the history of moves he has added if any mistakes.
+        Here we are looking what state we are in to change the disable function in case the user shall type or not
+        The tricky part is that set text only accepts string, so converting to and from to the main list which is
+        self.movesListForPrediction which later will go into the prediction tool
+        :return:
+        """
+
         if self.pushButton_2.text() == "confirm changes":
             self.historyText.setDisabled(True)
 
@@ -308,8 +341,11 @@ class Ui_MainWindow(object):
 
 
     def predictButton(self):
-        """For now this predict button is only simulation random prediction.
-        Wants to add the percentage and add the code when ready"""
+        """
+        This predict button for now is a simulation with random prediction.
+        :return:
+        """
+
         import random
 
         #5, 10, 15, 20 moves access the precidtion tool on those players
@@ -336,14 +372,25 @@ class Ui_MainWindow(object):
 
 
 class ConfirmDialog(QDialog):
+    """
+        Class for the dialog
+    """
 
-    def __init__(self, player1, player2, player3, color, parent=None): # to make  infront of parent
+    def __init__(self, player1, player2, player3, color, parent=None):
+        """
+
+        :param player1: getting the value of the first player
+        :param player2: getting the value of the second player
+        :param player3: getting the value of the third player
+        :param color: getting the color of the user
+        :param parent: So we making the window in front of the main window.
+        """
         self.player1 = player1
         self.player2 = player2
         self.player3 = player3
         self.userColor = color
         super().__init__(parent)
-        self.setWindowTitle('Confirm players and color')
+        self.setWindowTitle('Confirm players and  your color')
 
         QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
         self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
