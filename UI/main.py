@@ -1,5 +1,4 @@
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QInputDialog, QCompleter
 
@@ -61,22 +60,21 @@ class Ui_MainWindow(object):
         self.comboBox.addItem("Yellow")
         self.comboBox.addItem("Green")
 
-        l1 = self.addPlayer()
+        list_of_players = self.addPlayer()
         self.player1 = QtWidgets.QLineEdit(self.centralwidget)
         self.player1.setGeometry(QtCore.QRect(110, 200, 113, 20))
         self.player1.setObjectName("player1")
-
-        self.player1.setCompleter(QCompleter(l1))
+        self.player1.setCompleter(QCompleter(list_of_players))
 
         self.player2 = QtWidgets.QLineEdit(self.centralwidget)
         self.player2.setGeometry(QtCore.QRect(110, 270, 113, 20))
         self.player2.setObjectName("player2")
-        self.player2.setCompleter(QCompleter(l1))
+        self.player2.setCompleter(QCompleter(list_of_players))
 
         self.player3 = QtWidgets.QLineEdit(self.centralwidget)
         self.player3.setGeometry(QtCore.QRect(110, 340, 113, 20))
         self.player3.setObjectName("player3")
-        self.player3.setCompleter(QCompleter(l1))
+        self.player3.setCompleter(QCompleter(list_of_players))
 
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -84,26 +82,53 @@ class Ui_MainWindow(object):
     def getInfoAboutGame(self):
         """
         Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
+        First we need to check that the players are in the data so the prediction can be done on them.
         :return:
         """
-        #getting the color inserted of the user
+        # getting the color inserted of the user
         self.userColor = self.comboBox.currentText()
 
-        #getting each player and appending it to a list.
+        # Taking each name of each player
         p1 = self.player1.text()
         p2 = self.player2.text()
         p3 = self.player3.text()
-        self.opponents = [p1, p2, p3]
+
+        # Using the function to get all players from the txt files.
+        all_player_list = self.addPlayer()
 
 
+        # Here we are checking that there is three different players, from our data.
+        number = 0
+        for name in all_player_list:
 
-        dlg = ConfirmDialog(self.opponents[0], self.opponents[1], self.opponents[2], self.userColor)
-        if dlg.exec():
-            print("Success!")
-            self.window2()
-            #send players to training model
+            if p1 == name and (p1 != p2 or p1 != p3):
+                number += 1
+            elif p2 == name and (p2 != p1 or p2 != p3):
+                number += 1
+            elif p3 == name and (p3 != p2 or p1 != p1):
+                number += 1
+        # Checking if we have three different players so we are sending the data through to the confirmation.
+        if number == 3:
+            self.opponents = [p1, p2, p3]
+            self.opponents = list(dict.fromkeys(self.opponents))
+            print(self.opponents)
+            print(len(self.opponents))
+
+            # Here is the confirm dialog, just to make sure he inserted the right thing before sending it to the
+            # training model.
+            dlg = ConfirmDialog(self.opponents, self.userColor)
+            if dlg.exec():
+                print("Success!")
+                self.window2()
+                # henrikfunction(self.opponents, self.userColor)
+                # send players to training model
+            else:
+                print("Cancel!")
         else:
-            print("Cancel!")
+            print("nanna")
+            # maybe say something.
+
+
 
 
     def addPlayer(self): # have to fix that he cant add the same player three times.
@@ -136,7 +161,7 @@ class Ui_MainWindow(object):
 
         """
 
-        #if confirm then make the colors.
+        # if confirm then make the colors.
         self.colors = ["Red", "Blue", "Yellow", "Green"]
         # deleting the color the user has inserted to set the style with the other.
         self.colors.remove(self.userColor)
@@ -153,7 +178,7 @@ class Ui_MainWindow(object):
         """
 
         print(self.opponents, "checking if players are coming into window")
-        #print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
+        # print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
         self.historyOfMoves = ""
         self.movesListForPrediction = []
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -175,13 +200,13 @@ class Ui_MainWindow(object):
         self.tableView_3.setObjectName("player3")
         self.tableView_3.setDisabled(True)
 
-        #LABEL 2-10 is labels for later showing the predicted players and adding the percentage
+        # LABEL 2-10 is labels for later showing the predicted players and adding the percentage
 
-        #THE PREDICTION OF THE FIRST PLAYER
+        # THE PREDICTION OF THE FIRST PLAYER
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(120, 140, 47, 13))
         self.label_2.setObjectName("label_2")
-        self.label_2.setText(self.player1.text().capitalize())
+        self.label_2.setText(self.player1.text())
         self.label_2.adjustSize()
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
@@ -196,7 +221,7 @@ class Ui_MainWindow(object):
         self.label_4.setText(self.player3.text())
         self.label_4.adjustSize()
 
-        #THE PREDICTION OF THE SECOND PLAYER
+        # THE PREDICTION OF THE SECOND PLAYER
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(370, 140, 47, 13))
         self.label_5.setObjectName("label_5")
@@ -215,7 +240,7 @@ class Ui_MainWindow(object):
         self.label_7.setText(self.player3.text())
         self.label_7.adjustSize()
 
-        #THE PREDICTION OF THE THIRD PLAYER
+        # THE PREDICTION OF THE THIRD PLAYER
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
         self.label_8.setGeometry(QtCore.QRect(620, 140, 47, 13))
         self.label_8.setObjectName("label_8")
@@ -250,7 +275,7 @@ class Ui_MainWindow(object):
         self.lineEdit1 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit1.setGeometry(QtCore.QRect(120, 370, 451, 41))
         self.lineEdit1.setObjectName("lineEdit")
-        self.lineEdit1.setPlaceholderText("a1-b3 h12-g8 a1-a12 b4-b44")
+        self.lineEdit1.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
 
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(630, 380, 131, 23))
@@ -276,16 +301,17 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.opponentsColor()
-    #DANIEL
+
+    # DANIEL
     def addMoves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
         The user has to add the right format example: 'Qa1-a2 a1-a2 a1-a2 a1-a2' or when a player is
         missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
 
-        #Using regex to get the right format.
+        # Using regex to get the right format.
         move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
         if re.match(f'{move} {move} {move} {move}', self.lineEdit1.text()):
-            #the last is for a space?! we can have whatever in between them, FIX!!! can add whatever after
+            # the last is for a space?! we can have whatever in between them, FIX!!! can add whatever after
             print(self.movesListForPrediction, "before add")
             self.movesListForPrediction.append([self.lineEdit1.text()])
             print(self.movesListForPrediction, "after add")
@@ -299,9 +325,9 @@ class Ui_MainWindow(object):
             # setting the historyofMoves string to empty because we are using from the list each time to string.
             self.historyOfMoves = ""
 
-        #have to clear the labelwindow
+        # have to clear the labelwindow
         self.lineEdit1.clear()
-        #print(self.movesListForPrediction) # this list is for Henrik
+        # print(self.movesListForPrediction) # this list is for Henrik
 
     def changedH(self):
         """
@@ -327,7 +353,7 @@ class Ui_MainWindow(object):
             self.historyOfMoves = ""
 
             self.pushButton_2.setText("Change history")
-            #deleting any comma which may be there.
+            # deleting any comma which may be there.
             for i in range(len(self.movesListForPrediction)):
                 if self.movesListForPrediction[i] == [""]:
                     self.movesListForPrediction.pop(i)
@@ -335,7 +361,7 @@ class Ui_MainWindow(object):
             print(self.movesListForPrediction, "after changing history")
         else:
             self.pushButton_2.setText("confirm changes")
-            #print(self.pushButton_2.text())
+            # print(self.pushButton_2.text())
             self.historyText.setDisabled(False)
 
 
@@ -348,16 +374,16 @@ class Ui_MainWindow(object):
 
         import random
 
-        #5, 10, 15, 20 moves access the precidtion tool on those players
+        # 5, 10, 15, 20 moves access the prediction tool on those players
         print(self.opponents)
         random.shuffle(self.opponents)
         print(self.opponents)
 
         print("predictbutton")
-        self.label_2.setText(self.opponents[0]) #first color player
+        self.label_2.setText(self.opponents[0])  # first color player
         self.label_3.setText(self.opponents[1])
         self.label_4.setText(self.opponents[2])
-        self.label_5.setText(self.opponents[0])# second color
+        self.label_5.setText(self.opponents[0]  )# second color
         self.label_6.setText(self.opponents[1])
         self.label_7.setText(self.opponents[2])
         self.label_8.setText(self.opponents[0]) # third color
@@ -367,7 +393,7 @@ class Ui_MainWindow(object):
                                  self.label_8, self.label_9, self.label_10]
         for i in listOfLabelsOfPlayers:
             i.adjustSize()
-        # here we also know the order of colors, so we can add the labels accordingly
+
 
 
 
@@ -376,47 +402,42 @@ class ConfirmDialog(QDialog):
         Class for the dialog
     """
 
-    def __init__(self, player1, player2, player3, color, parent=None):
+    def __init__(self, player_list, color, parent=None):
         """
 
-        :param player1: getting the value of the first player
-        :param player2: getting the value of the second player
-        :param player3: getting the value of the third player
+        :param player_list: getting the inserted players
         :param color: getting the color of the user
         :param parent: So we making the window in front of the main window.
         """
-        self.player1 = player1
-        self.player2 = player2
-        self.player3 = player3
+        self.player_list = player_list
         self.userColor = color
+        # making it in front of the other window
         super().__init__(parent)
         self.setWindowTitle('Confirm players and  your color')
+        q_btn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+        self.buttonBox = QtWidgets.QDialogButtonBox(q_btn)
 
-        QBtn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
-        self.buttonBox = QtWidgets.QDialogButtonBox(QBtn)
-
-
+        # Pushbuttons, OK or cancel
         self.buttonBox.accepted.connect(self.accept)
-
         self.buttonBox.rejected.connect(self.reject)
-
         self.layout = QtWidgets.QVBoxLayout()
-        messageToSend = (f"player 1 = {self.player1}, player2 = {self.player2}, player3 = {self.player3}, your color is = {self.userColor}")
-        message = QtWidgets.QLabel(messageToSend)
+        # Message to send to user.
+        message = (f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, your color is = {self.userColor}")
+        print(message)
+        message = QtWidgets.QLabel(message)
         self.layout.addWidget(message)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
-
-
+# Starting the application.
 if __name__ == "__main__":
     import sys
+
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
 
 
