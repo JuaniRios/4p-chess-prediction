@@ -4,7 +4,30 @@ from PyQt5.QtWidgets import QDialog, QCompleter
 import re
 
 
-class Ui_MainWindow(object):
+def add_player():
+    """
+    Add player is a function which takes the top 100 players of team and solo and concatenate them into a bigger
+    list. It only accepts one name once in case a player plays both. Then we are sending the list to the input
+    field for the user to select players.
+    :return: a list of all available players
+    """
+    # getting players from team chess
+    with open('top100players_ffa.txt') as f1:
+        teams = f1.read().splitlines()
+
+    # getting players from solo chess
+    with open('top100players_solo.txt') as f2:
+        solo = f2.read().splitlines()
+
+    # adding both lists
+    list_of_players_available = teams + solo
+    # to delete duplicates
+    list_of_players_available = list(dict.fromkeys(list_of_players_available))
+
+    return list_of_players_available
+
+
+class UiMainWindow(object):
     """
     Making the first window to the user, where he inserts the name of the players and which color he is using.
     """
@@ -17,22 +40,22 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(590, 400, 151, 23))
-        self.pushButton.setObjectName("pushButton")
-        self.pushButton.setText("Submit")
-        self.pushButton.clicked.connect(self.getInfoAboutGame)
+        self.submit_button = QtWidgets.QPushButton(self.centralwidget)
+        self.submit_button.setGeometry(QtCore.QRect(590, 400, 151, 23))
+        self.submit_button.setObjectName("pushButton")
+        self.submit_button.setText("Submit")
+        self.submit_button.clicked.connect(self.get_info_about_game)
 
-        self.welcometext = QtWidgets.QTextEdit(self.centralwidget)
-        self.welcometext.setGeometry(QtCore.QRect(30, 30, 680, 150))
-        self.welcometext.setObjectName("lineEdit")
-        self.welcometext.setText("Welcome to the 4 player chess predictor.\n\nPlease insert the three players and "
-                                 "which colour you are playing with in this game. Please notice that all the three "
-                                 "players have to exist in our data for this to work. If you entered players wroungly,"
-                                 " then you will not proceed to the next window. If there is no suggestion for a player"
-                                 ", then the player do not exist in our data or you might have misspelled the player.")
-        self.welcometext.setDisabled(True)
-        self.welcometext.setFont(QtGui.QFont("Arial", 12))
+        self.welcome_text = QtWidgets.QTextEdit(self.centralwidget)
+        self.welcome_text.setGeometry(QtCore.QRect(30, 30, 680, 150))
+        self.welcome_text.setObjectName("lineEdit")
+        self.welcome_text.setText("Welcome to the 4 player chess predictor.\n\nPlease insert the three players and "
+                                  "which colour you are playing with in this game. Please notice that all the three "
+                                  "players have to exist in our data for this to work. If you entered players wrongly, "
+                                  "then you will not proceed to the next window. If there is no suggestion for a player"
+                                  ", then the player do not exist in our data or you might have misspelled the player.")
+        self.welcome_text.setDisabled(True)
+        self.welcome_text.setFont(QtGui.QFont("Arial", 12))
 
         self.label_inserting_p1 = QtWidgets.QLabel(self.centralwidget)
         self.label_inserting_p1.setGeometry(QtCore.QRect(30, 200, 47, 13))
@@ -62,7 +85,7 @@ class Ui_MainWindow(object):
         self.comboBox.addItem("Yellow")
         self.comboBox.addItem("Green")
 
-        list_of_players = self.addPlayer()
+        list_of_players = add_player()
         self.player1 = QtWidgets.QLineEdit(self.centralwidget)
         self.player1.setGeometry(QtCore.QRect(110, 200, 113, 20))
         self.player1.setObjectName("player1")
@@ -80,7 +103,7 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
 
-    def getInfoAboutGame(self):
+    def get_info_about_game(self):
         """
         Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
         First we need to check that the players are in the data so the prediction can be done on them.
@@ -95,7 +118,7 @@ class Ui_MainWindow(object):
         p3 = self.player3.text()
 
         # Using the function to get all players from the txt files.
-        all_player_list = self.addPlayer()
+        all_player_list = add_player()
 
         # Here we are checking that there is three different players, from our data.
         number = 0
@@ -118,41 +141,18 @@ class Ui_MainWindow(object):
             # training model.
             dlg = ConfirmDialog(self.opponents, self.user_color)
             if dlg.exec():
-                dict_to_training_model = {"players": self.opponents, "user_color": self.user_color}
-                print(dict_to_training_model, "check what is sending to the training model")
-                # henrikfunction(dict_to_training_model) # what do we return from here? TRUE and then the window opens?
-                print("Success!")
-                self.window2()
 
+                # henrik function(self.opponents, self.user_color) # what do we return from here?
+                print("Success!")
+                print(self.opponents, self.user_color, "to henrik")
+                self.window2()
 
             else:
                 print("Cancel!")
         else:
             print("Oops, something is wrong.")
 
-    def addPlayer(self):  # have to fix that he cant add the same player three times.
-        """
-        Add player is a function which takes the top 100 players of team and solo and concatenate them into a bigger
-        list. It only accepts one name once in case a player plays both. Then we are sending the list to the input
-        field for the user to select players.
-        :return: a list of all available players
-        """
-        # getting players from team chess
-        with open('top100players_ffa.txt') as f1:
-            teams = f1.read().splitlines()
-
-        # getting players from solo chess
-        with open('top100players_solo.txt') as f2:
-            solo = f2.read().splitlines()
-
-        # adding both lists
-        list_of_players_available = teams + solo
-        # to delete duplicates
-        list_of_players_available = list(dict.fromkeys(list_of_players_available))
-
-        return list_of_players_available
-
-    def opponentsColor(self):
+    def opponents_color(self):
         """
         This function takes in what color the user has inserted and changes the colors displayed on window 2 later,
         to understand better which player is which.
@@ -257,18 +257,18 @@ class Ui_MainWindow(object):
         self.label_10.setText(self.player3.text())
         self.label_10.adjustSize()
 
-        self.infotext = QtWidgets.QTextEdit(self.centralwidget)
-        self.infotext.setGeometry(QtCore.QRect(70, 220, 630, 140))
-        self.infotext.setObjectName("lineEdit")
-        self.infotext.setText("Here you have to add four moves per round, so one move per player. The accepted moves "
-                              "are setting which piece following with where it is moving on the board.\nIf a player has "
-                              "dropped out replace his turn with a '0'."
-                              "\n\nExample:"
-                              "'Qa2-Qb4 g4-g6 b2-b1 Qh7-Qh8'"
-                              "\nExample: 'a2-a3 a1-a2 Qb5-Qb7 0'\nIf you wants to change the history, press"
-                              "the button and change the mistake")
-        self.infotext.setDisabled(True)
-        self.infotext.setFont(QtGui.QFont("Arial", 11))
+        self.info_text = QtWidgets.QTextEdit(self.centralwidget)
+        self.info_text.setGeometry(QtCore.QRect(70, 220, 630, 140))
+        self.info_text.setObjectName("lineEdit")
+        self.info_text.setText("Here you have to add four moves per round, so one move per player. The accepted moves "
+                               "are setting which piece following with where it is moving on the board.\nIf a player has "
+                               "dropped out replace his turn with a '0'."
+                               "\n\nExample:"
+                               "'Qa2-Qb4 g4-g6 b2-b1 Qh7-Qh8'"
+                               "\nExample: 'a2-a3 a1-a2 Qb5-Qb7 0'\nIf you wants to change the history, press"
+                               "the button and change the mistake")
+        self.info_text.setDisabled(True)
+        self.info_text.setFont(QtGui.QFont("Arial", 11))
 
         self.lineEdit1 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit1.setGeometry(QtCore.QRect(120, 370, 451, 41))
@@ -296,11 +296,12 @@ class Ui_MainWindow(object):
         self.pushButton_3.clicked.connect(self.predict_button)
 
         MainWindow.setCentralWidget(self.centralwidget)
-        self.opponentsColor()
+        # changing the background to visualize which color is where depending on order.
+        self.opponents_color()
 
     def add_moves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
-        The user has to add the right format example: 'Qa1-a2 a1-a2 a1-a2 a1-a2' or when a player is
+        The user has to add the right format example: 'Qa1-Qa2 a1-a2 a1-a2 a1-a2' or when a player is
         missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
 
         # Using regex to get the right format.
@@ -381,7 +382,7 @@ class Ui_MainWindow(object):
         random.shuffle(self.opponents)
 
         print(self.opponents, self.user_color, "to see if we can access it here,")
-        print("predictbutton")
+        print("predict button")
         self.label_2.setText(self.opponents[0])  # first color player
         self.label_3.setText(self.opponents[1])
         self.label_4.setText(self.opponents[2])
@@ -391,9 +392,9 @@ class Ui_MainWindow(object):
         self.label_8.setText(self.opponents[0])  # third color
         self.label_9.setText(self.opponents[1])
         self.label_10.setText(self.opponents[2])
-        listOfLabelsOfPlayers = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
-                                 self.label_8, self.label_9, self.label_10]
-        for i in listOfLabelsOfPlayers:
+        list_of_labels_of_players = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
+                                     self.label_8, self.label_9, self.label_10]
+        for i in list_of_labels_of_players:
             i.adjustSize()
 
 
@@ -417,13 +418,14 @@ class ConfirmDialog(QDialog):
         q_btn = QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
         self.buttonBox = QtWidgets.QDialogButtonBox(q_btn)
 
-        # Pushbuttons, OK or cancel
+        # Push button, OK or cancel
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.layout = QtWidgets.QVBoxLayout()
         # Message to send to user.
         message = (
-            f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, your color is = {self.userColor}")
+            f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, "
+            f"your color is = {self.userColor}")
         print(message)
         message = QtWidgets.QLabel(message)
         self.layout.addWidget(message)
@@ -437,7 +439,7 @@ if __name__ == "__main__":
 
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
+    ui = UiMainWindow()
     ui.start(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
