@@ -1,6 +1,5 @@
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QInputDialog, QCompleter
+from PyQt5.QtWidgets import QDialog, QCompleter
 
 import re
 
@@ -9,6 +8,7 @@ class Ui_MainWindow(object):
     """
     Making the first window to the user, where he inserts the name of the players and which color he is using.
     """
+
     def start(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -80,7 +80,6 @@ class Ui_MainWindow(object):
 
         MainWindow.setCentralWidget(self.centralwidget)
 
-
     def getInfoAboutGame(self):
         """
         Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
@@ -88,7 +87,7 @@ class Ui_MainWindow(object):
         :return:
         """
         # getting the color inserted of the user
-        self.userColor = self.comboBox.currentText()
+        self.user_color = self.comboBox.currentText()
 
         # Taking each name of each player
         p1 = self.player1.text()
@@ -97,7 +96,6 @@ class Ui_MainWindow(object):
 
         # Using the function to get all players from the txt files.
         all_player_list = self.addPlayer()
-
 
         # Here we are checking that there is three different players, from our data.
         number = 0
@@ -118,42 +116,41 @@ class Ui_MainWindow(object):
 
             # Here is the confirm dialog, just to make sure he inserted the right thing before sending it to the
             # training model.
-            dlg = ConfirmDialog(self.opponents, self.userColor)
+            dlg = ConfirmDialog(self.opponents, self.user_color)
             if dlg.exec():
+                dict_to_training_model = {"players": self.opponents, "user_color": self.user_color}
+                print(dict_to_training_model, "check what is sending to the training model")
+                # henrikfunction(dict_to_training_model) # what do we return from here? TRUE and then the window opens?
                 print("Success!")
                 self.window2()
-                # henrikfunction(self.opponents, self.userColor)
-                # send players to training model
+
+
             else:
                 print("Cancel!")
         else:
             print("Oops, something is wrong.")
 
-
-
-
-    def addPlayer(self): # have to fix that he cant add the same player three times.
+    def addPlayer(self):  # have to fix that he cant add the same player three times.
         """
         Add player is a function which takes the top 100 players of team and solo and concatenate them into a bigger
         list. It only accepts one name once in case a player plays both. Then we are sending the list to the input
         field for the user to select players.
         :return: a list of all available players
         """
-
+        # getting players from team chess
         with open('top100players_ffa.txt') as f1:
             teams = f1.read().splitlines()
 
+        # getting players from solo chess
         with open('top100players_solo.txt') as f2:
             solo = f2.read().splitlines()
 
         # adding both lists
-        listOfPlayersAvailable = teams + solo
+        list_of_players_available = teams + solo
         # to delete duplicates
-        listOfPlayersAvailable = list(dict.fromkeys(listOfPlayersAvailable))
+        list_of_players_available = list(dict.fromkeys(list_of_players_available))
 
-
-        return listOfPlayersAvailable
-
+        return list_of_players_available
 
     def opponentsColor(self):
         """
@@ -165,7 +162,7 @@ class Ui_MainWindow(object):
         # if confirm then make the colors.
         self.colors = ["Red", "Blue", "Yellow", "Green"]
         # deleting the color the user has inserted to set the style with the other.
-        self.colors.remove(self.userColor)
+        self.colors.remove(self.user_color)
         self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
         self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
         self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
@@ -180,8 +177,8 @@ class Ui_MainWindow(object):
 
         print(self.opponents, "checking if players are coming into window")
         # print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
-        self.historyOfMoves = ""
-        self.movesListForPrediction = []
+        self.history_of_moves = ""
+        self.moves_list_prediction = []
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         MainWindow.setWindowTitle("4-player Chess predictor")
         self.centralwidget.setObjectName("centralwidget")
@@ -280,8 +277,8 @@ class Ui_MainWindow(object):
 
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(630, 380, 131, 23))
-        self.pushButton.setText("addMoves")
-        self.pushButton.clicked.connect(self.addMoves)
+        self.pushButton.setText("Add moves")
+        self.pushButton.clicked.connect(self.add_moves)
 
         self.historyText = QtWidgets.QTextEdit(self.centralwidget)
         self.historyText.setGeometry(QtCore.QRect(120, 420, 451, 101))
@@ -290,20 +287,18 @@ class Ui_MainWindow(object):
 
         self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_2.setGeometry(QtCore.QRect(630, 440, 131, 41))
-        self.pushButton_2.setText("changeHistory")
-        self.pushButton_2.clicked.connect(self.changedH)
+        self.pushButton_2.setText("Change history")
+        self.pushButton_2.clicked.connect(self.changed_history)
 
         self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_3.setGeometry(QtCore.QRect(650, 560, 70, 30))
         self.pushButton_3.setText("predict")
-        self.pushButton_3.clicked.connect(self.predictButton)
-
-
+        self.pushButton_3.clicked.connect(self.predict_button)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.opponentsColor()
 
-    def addMoves(self):
+    def add_moves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
         The user has to add the right format example: 'Qa1-a2 a1-a2 a1-a2 a1-a2' or when a player is
         missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
@@ -319,24 +314,24 @@ class Ui_MainWindow(object):
         # again but without the space or the comma in the end.
 
         if re.fullmatch(f'{moves}', self.lineEdit1.text()):
-            print(self.movesListForPrediction, "before add")
-            self.movesListForPrediction.append([self.lineEdit1.text().replace(", ", " ").replace(",", " ")])
-            print(self.movesListForPrediction, "after add")
+            print(self.moves_list_prediction, "before add")
+            self.moves_list_prediction.append([self.lineEdit1.text().replace(", ", " ").replace(",", " ")])
+            print(self.moves_list_prediction, "after add")
             # maybe here and or to include the players dropping with a 0?
 
-            for i in self.movesListForPrediction:
-                self.historyOfMoves += "".join(i)
-                self.historyOfMoves += ","
+            for i in self.moves_list_prediction:
+                self.history_of_moves += "".join(i)
+                self.history_of_moves += ","
 
-            self.historyText.setText(self.historyOfMoves)
-            # setting the historyofMoves string to empty because we are using from the list each time to string.
-            self.historyOfMoves = ""
+            self.historyText.setText(self.history_of_moves)
+            # setting the history_of_moves string to empty because we are using from the list each time to string.
+            self.history_of_moves = ""
 
-        #have to clear the labelwindow
+        # have to clear the label window
         self.lineEdit1.clear()
-        #print(self.movesListForPrediction) # this list is for Henrik
+        # print(self.movesListForPrediction) # this list is for Henrik
 
-    def changedH(self):
+    def changed_history(self):
         """
         This function is used when the player wants to change the history of moves he has added if any mistakes.
         Here we are looking what state we are in to change the disable function in case the user shall type or not
@@ -348,34 +343,32 @@ class Ui_MainWindow(object):
         if self.pushButton_2.text() == "confirm changes":
             self.historyText.setDisabled(True)
 
-            self.historyOfMoves = self.historyText.toPlainText()
-            splitting_data = self.historyOfMoves.split(",")
+            self.history_of_moves = self.historyText.toPlainText()
+            splitting_data = self.history_of_moves.split(",")
             new_list = []
             # accessing each round and making a new list.
             for w in splitting_data:
                 list1 = w.split(",")
                 new_list.append(list1)
 
-            self.movesListForPrediction = new_list
+            self.moves_list_prediction = new_list
             # making the history of moves empty again.
-            self.historyOfMoves = ""
+            self.history_of_moves = ""
 
             self.pushButton_2.setText("Change history")
             # deleting any comma which may be there.
-            for i in range(len(self.movesListForPrediction)):
-                if self.movesListForPrediction[i] == [""]:
-                    self.movesListForPrediction.pop(i)
+            for i in range(len(self.moves_list_prediction)):
+                if self.moves_list_prediction[i] == [""]:
+                    self.moves_list_prediction.pop(i)
 
-            print(self.movesListForPrediction, "after changing history")
+            print(self.moves_list_prediction, "after changing history")
         else:
             # here we changing the name of the button and making it disabled.
             self.pushButton_2.setText("confirm changes")
 
             self.historyText.setDisabled(False)
 
-
-
-    def predictButton(self):
+    def predict_button(self):
         """
         This predict button for now is a simulation with random prediction.
         :return:
@@ -387,23 +380,21 @@ class Ui_MainWindow(object):
 
         random.shuffle(self.opponents)
 
-        print(self.opponents, self.userColor, "to see if we can access it here,")
+        print(self.opponents, self.user_color, "to see if we can access it here,")
         print("predictbutton")
         self.label_2.setText(self.opponents[0])  # first color player
         self.label_3.setText(self.opponents[1])
         self.label_4.setText(self.opponents[2])
-        self.label_5.setText(self.opponents[0]  )# second color
+        self.label_5.setText(self.opponents[0])  # second color
         self.label_6.setText(self.opponents[1])
         self.label_7.setText(self.opponents[2])
-        self.label_8.setText(self.opponents[0]) # third color
+        self.label_8.setText(self.opponents[0])  # third color
         self.label_9.setText(self.opponents[1])
         self.label_10.setText(self.opponents[2])
         listOfLabelsOfPlayers = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
                                  self.label_8, self.label_9, self.label_10]
         for i in listOfLabelsOfPlayers:
             i.adjustSize()
-
-
 
 
 class ConfirmDialog(QDialog):
@@ -431,12 +422,14 @@ class ConfirmDialog(QDialog):
         self.buttonBox.rejected.connect(self.reject)
         self.layout = QtWidgets.QVBoxLayout()
         # Message to send to user.
-        message = (f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, your color is = {self.userColor}")
+        message = (
+            f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, your color is = {self.userColor}")
         print(message)
         message = QtWidgets.QLabel(message)
         self.layout.addWidget(message)
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
+
 
 # Starting the application.
 if __name__ == "__main__":
@@ -448,5 +441,3 @@ if __name__ == "__main__":
     ui.start(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
-
-
