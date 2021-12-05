@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QDialog, QCompleter
 import re
 
 
-def add_player():
+def get_player():
     """
     Add player is a function which takes the top 100 players of team and solo and concatenate them into a bigger
     list. It only accepts one name once in case a player plays both. Then we are sending the list to the input
@@ -85,7 +85,7 @@ class UiMainWindow(object):
         self.comboBox.addItem("Yellow")
         self.comboBox.addItem("Green")
 
-        list_of_players = add_player()
+        list_of_players = get_player()
         self.player1 = QtWidgets.QLineEdit(self.centralwidget)
         self.player1.setGeometry(QtCore.QRect(110, 200, 113, 20))
         self.player1.setObjectName("player1")
@@ -118,7 +118,7 @@ class UiMainWindow(object):
         p3 = self.player3.text()
 
         # Using the function to get all players from the txt files.
-        all_player_list = add_player()
+        all_player_list = get_player()
 
         # Here we are checking that there is three different players, from our data.
         number = 0
@@ -163,9 +163,9 @@ class UiMainWindow(object):
         self.colors = ["Red", "Blue", "Yellow", "Green"]
         # deleting the color the user has inserted to set the style with the other.
         self.colors.remove(self.user_color)
-        self.tableView.setStyleSheet(f"background-color: {self.colors[0]}")
-        self.tableView_2.setStyleSheet(f"background-color: {self.colors[1]}")
-        self.tableView_3.setStyleSheet(f"background-color: {self.colors[2]}")
+        self.first_color.setStyleSheet(f"background-color: {self.colors[0]}")
+        self.second_color.setStyleSheet(f"background-color: {self.colors[1]}")
+        self.third_color.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def window2(self):
         """
@@ -183,20 +183,21 @@ class UiMainWindow(object):
         MainWindow.setWindowTitle("4-player Chess predictor")
         self.centralwidget.setObjectName("centralwidget")
 
-        self.tableView = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView.setGeometry(QtCore.QRect(40, 30, 201, 100))
-        self.tableView.setObjectName("player1")
-        self.tableView.setDisabled(True)
+        # These three are for visualisation purposes, so we know later which player is predicted.
+        self.first_color = QtWidgets.QTextEdit(self.centralwidget)
+        self.first_color.setGeometry(QtCore.QRect(40, 30, 201, 100))
+        self.first_color.setObjectName("player1")
+        self.first_color.setDisabled(True)
 
-        self.tableView_2 = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView_2.setGeometry(QtCore.QRect(290, 30, 201, 100))
-        self.tableView_2.setObjectName("player2")
-        self.tableView_2.setDisabled(True)
+        self.second_color = QtWidgets.QTextEdit(self.centralwidget)
+        self.second_color.setGeometry(QtCore.QRect(290, 30, 201, 100))
+        self.second_color.setObjectName("player2")
+        self.second_color.setDisabled(True)
 
-        self.tableView_3 = QtWidgets.QTextEdit(self.centralwidget)
-        self.tableView_3.setGeometry(QtCore.QRect(540, 30, 201, 100))
-        self.tableView_3.setObjectName("player3")
-        self.tableView_3.setDisabled(True)
+        self.third_color = QtWidgets.QTextEdit(self.centralwidget)
+        self.third_color.setGeometry(QtCore.QRect(540, 30, 201, 100))
+        self.third_color.setObjectName("player3")
+        self.third_color.setDisabled(True)
 
         # LABEL 2-10 is labels for later showing the predicted players and adding the percentage
 
@@ -270,33 +271,36 @@ class UiMainWindow(object):
         self.info_text.setDisabled(True)
         self.info_text.setFont(QtGui.QFont("Arial", 11))
 
+        # This is the field where the user add moves and being saved in the prediction list.
         self.lineEdit1 = QtWidgets.QLineEdit(self.centralwidget)
         self.lineEdit1.setGeometry(QtCore.QRect(120, 370, 451, 41))
         self.lineEdit1.setObjectName("lineEdit")
         self.lineEdit1.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
 
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(630, 380, 131, 23))
-        self.pushButton.setText("Add moves")
-        self.pushButton.clicked.connect(self.add_moves)
+        self.add_moves_button = QtWidgets.QPushButton(self.centralwidget)
+        self.add_moves_button.setGeometry(QtCore.QRect(630, 380, 131, 23))
+        self.add_moves_button.setText("Add moves")
+        self.add_moves_button.clicked.connect(self.add_moves)
 
+        # Here the user can change the history, in case something was wrong.
         self.historyText = QtWidgets.QTextEdit(self.centralwidget)
         self.historyText.setGeometry(QtCore.QRect(120, 420, 451, 101))
         self.historyText.setObjectName("textEdit")
         self.historyText.setDisabled(True)
 
-        self.pushButton_2 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_2.setGeometry(QtCore.QRect(630, 440, 131, 41))
-        self.pushButton_2.setText("Change history")
-        self.pushButton_2.clicked.connect(self.changed_history)
+        self.change_history_button = QtWidgets.QPushButton(self.centralwidget)
+        self.change_history_button .setGeometry(QtCore.QRect(630, 440, 131, 41))
+        self.change_history_button .setText("Change history")
+        self.change_history_button .clicked.connect(self.changed_history)
 
-        self.pushButton_3 = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton_3.setGeometry(QtCore.QRect(650, 560, 70, 30))
-        self.pushButton_3.setText("predict")
-        self.pushButton_3.clicked.connect(self.predict_button)
+        self.predict_pushbutton = QtWidgets.QPushButton(self.centralwidget)
+        self.predict_pushbutton.setGeometry(QtCore.QRect(650, 560, 70, 30))
+        self.predict_pushbutton.setText("predict")
+        self.predict_pushbutton.clicked.connect(self.predict_players)
 
         MainWindow.setCentralWidget(self.centralwidget)
         # changing the background to visualize which color is where depending on order.
+        # here we are setting the visualisation with the three color user is not.
         self.opponents_color()
 
     def add_moves(self):
@@ -307,6 +311,7 @@ class UiMainWindow(object):
         # Using regex to get the right format.
         # move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
         moves = r"((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2}(=[A-Z])?)|O-O|O-O-O|0)(\s|,\s?)){3}((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2})(=[A-Z])?|O-O|O-O-O)|0)"
+
         # this regex accepts one or zero big character followed by exactly one small character, 1 or 2 digits, a dash or an x
         # followed by again 0 or 1 big character, exactly one small character, 1 or 2 digits, 0 or 1 =[A-Z] for pawn promotion
         # OR the castling moves OR a 0. This group represents the possible moves and
@@ -341,7 +346,7 @@ class UiMainWindow(object):
         :return:
         """
         # checking what state we are in with the button, if the user wants to change the data or not.
-        if self.pushButton_2.text() == "confirm changes":
+        if self.change_history_button.text() == "confirm changes":
             self.historyText.setDisabled(True)
 
             self.history_of_moves = self.historyText.toPlainText()
@@ -356,7 +361,7 @@ class UiMainWindow(object):
             # making the history of moves empty again.
             self.history_of_moves = ""
 
-            self.pushButton_2.setText("Change history")
+            self.change_history_button.setText("Change history")
             # deleting any comma which may be there.
             for i in range(len(self.moves_list_prediction)):
                 if self.moves_list_prediction[i] == [""]:
@@ -365,15 +370,18 @@ class UiMainWindow(object):
             print(self.moves_list_prediction, "after changing history")
         else:
             # here we changing the name of the button and making it disabled.
-            self.pushButton_2.setText("confirm changes")
+            self.change_history_button.setText("confirm changes")
 
+            # making the window changeable
             self.historyText.setDisabled(False)
 
-    def predict_button(self):
+    def predict_players(self):
         """
         This predict button for now is a simulation with random prediction.
-        :return:
+        :return: get the prediction from the model with the percentage of which
         """
+        print(self.moves_list_prediction, "this shall go to henrik")
+        # predicted = henrik_function2(self.moves_list_prediction)
 
         import random
 
