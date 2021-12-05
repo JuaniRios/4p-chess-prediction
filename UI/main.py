@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDialog, QCompleter
+from PyQt5.QtWidgets import QDialog, QCompleter, QMainWindow
 
 import re
 
@@ -27,17 +27,19 @@ def get_player():
     return list_of_players_available
 
 
-class UiMainWindow(object):
+class UiMainWindow(QMainWindow):
     """
     Making the first window to the user, where he inserts the name of the players and which color he is using.
     """
 
-    def start(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(800, 600)
-        MainWindow.setWindowTitle("4-player Chess predictor")
+    def __init__(self):
+        super().__init__()
 
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.setObjectName("MainWindow")
+        self.resize(800, 600)
+        self.setWindowTitle("4-player Chess predictor")
+
+        self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
 
         self.submit_button = QtWidgets.QPushButton(self.centralwidget)
@@ -101,7 +103,8 @@ class UiMainWindow(object):
         self.player3.setObjectName("player3")
         self.player3.setCompleter(QCompleter(list_of_players))
 
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
+
 
     def get_info_about_game(self):
         """
@@ -179,8 +182,8 @@ class UiMainWindow(object):
         # print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
         self.history_of_moves = ""
         self.moves_list_prediction = []
-        self.centralwidget = QtWidgets.QWidget(MainWindow)
-        MainWindow.setWindowTitle("4-player Chess predictor")
+        self.centralwidget = QtWidgets.QWidget()
+        self.setWindowTitle("4-player Chess predictor")
         self.centralwidget.setObjectName("centralwidget")
 
         # These three are for visualisation purposes, so we know later which player is predicted.
@@ -298,7 +301,7 @@ class UiMainWindow(object):
         self.predict_pushbutton.setText("predict")
         self.predict_pushbutton.clicked.connect(self.predict_players)
 
-        MainWindow.setCentralWidget(self.centralwidget)
+        self.setCentralWidget(self.centralwidget)
         # changing the background to visualize which color is where depending on order.
         # here we are setting the visualisation with the three color user is not.
         self.opponents_color()
@@ -444,10 +447,7 @@ class ConfirmDialog(QDialog):
 # Starting the application.
 if __name__ == "__main__":
     import sys
-
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
     ui = UiMainWindow()
-    ui.start(MainWindow)
-    MainWindow.show()
+    ui.show()
     sys.exit(app.exec_())
