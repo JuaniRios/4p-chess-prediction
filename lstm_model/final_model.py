@@ -50,7 +50,7 @@ def split_player(moves):
 
     player_moves = list(player_moves.values())
     output = [[" ".join(x)] for x in player_moves]
-
+    print(output)
     return output
 
 
@@ -226,20 +226,23 @@ def finalize_model(players, n_rounds):
 
 
 def interface_call(players, moves, n_moves):
-    # TODO: Connect so that in UI we call this function from module "ml_model.py"
-    '''
-    Function to start the pipeline:
-        1. Create evaluation model
-        2. Finalize model
-        3. returns the predictions in the correct format
+    try:
+        '''
+        Function to start the pipeline:
+            1. Create evaluation model
+            2. Finalize model
+            3. returns the predictions in the correct format
+    
+        :param players:
+        :param user_color:
+        :return:
+        '''
 
-    :param players:
-    :param user_color:
-    :return:
-    '''
+        final_model, tokenizer, max_len = finalize_model(players, n_moves)
+        list_moves = split_player(moves)
+        predictions = model_predict(final_model, list_moves, tokenizer, max_len)
 
-    final_model, tokenizer, max_len = finalize_model(players, n_moves)
-    list_moves = split_player(moves)
-    predictions = model_predict(final_model, list_moves, tokenizer, max_len)
+        return predictions
 
-    return predictions
+    except Exception as ER:
+        print(ER)

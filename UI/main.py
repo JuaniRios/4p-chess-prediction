@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QDialog, QCompleter, QMainWindow
 
 import re
+from lstm_model import final_model
 
 
 def get_player():
@@ -12,11 +13,11 @@ def get_player():
     :return: a list of all available players
     """
     # getting players from team chess
-    with open('top100players_ffa.txt') as f1:
+    with open('UI/top100players_ffa.txt') as f1:
         teams = f1.read().splitlines()
 
     # getting players from solo chess
-    with open('top100players_solo.txt') as f2:
+    with open('UI/top100players_solo.txt') as f2:
         solo = f2.read().splitlines()
 
     # adding both lists
@@ -275,7 +276,7 @@ class UiMainWindow(QMainWindow):
                                "are setting which piece following with where it is moving on the board.\nIf a player has "
                                "dropped out replace his turn with a '0'."
                                "\n\nExample:"
-                               "'Qa2-Qb4 g4-g6 b2-b1 Qh7-Qh8'"
+                               "Qa2-Qb4 g4-g6 b2-b1"
                                "\nExample: 'a2-a3 a1-a2 Qb5-Qb7 0'\nIf you wants to change the history, press"
                                "the button and change the mistake")
         self.info_text.setDisabled(True)
@@ -315,18 +316,19 @@ class UiMainWindow(QMainWindow):
 
     def add_moves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
-        The user has to add the right format example: 'Qa1-Qa2 a1-a2 a1-a2 a1-a2' or when a player is
-        missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a1-a2"""
+        The user has to add the right format example: 'Qa1-Qa2 a1-a2 a1-a2' or when a player is
+        missing he shall insert a 0 on this place: 'a1-a2 0 a1-a2 a'
+        Please enter without quotes."""
 
         # Using regex to get the right format.
         # move = r"[a-zA-Z]{1,2}\d{1,2}-[a-zA-Z]{1,2}\d{1,2}|0"
-        moves = r"((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2}(=[A-Z])?)|O-O|O-O-O|0)(\s|,\s?)){3}((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2})(=[A-Z])?|O-O|O-O-O)|0)"
+        moves = r"((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2}(=[A-Z])?)|O-O|O-O-O|0)(\s|,\s?)){2}((([A-Z]?[a-z]\d{1,2}(-|x)[A-Z]?[a-z]\d{1,2})(=[A-Z])?|O-O|O-O-O)|0)"
 
         # this regex accepts one or zero big character followed by exactly one small character, 1 or 2 digits, a dash or an x
         # followed by again 0 or 1 big character, exactly one small character, 1 or 2 digits, 0 or 1 =[A-Z] for pawn promotion
         # OR the castling moves OR a 0. This group represents the possible moves and
         # is followed by either exactly one space, or a comma with an optional space.
-        # This group is being repeated 3 times. The whole group is then repeated
+        # This group is being repeated 2 times. The whole group is then repeated
         # again but without the space or the comma in the end.
 
         if re.fullmatch(f'{moves}', self.add_moves_lineedit.text()):
@@ -391,25 +393,29 @@ class UiMainWindow(QMainWindow):
         :return: get the prediction from the model with the percentage of which
         """
         print(self.moves_list_prediction, "this shall go to henrik")
-        # predicted = henrik_function2(self.moves_list_prediction)
-
-        import random
+        #predicted = [[[0.5, 0.2, 0.3]], [[0.1, 0.455555, 0.444444]], [[0.000234324, 0.999, 0.0000]]]
+        print(self.opponents)
+        print(self.moves_list_prediction)
+        print(len(self.moves_list_prediction))
+        predicted = final_model.interface_call(self.opponents, self.moves_list_prediction, len(self.moves_list_prediction))
+        print(predicted)
+        #import random
 
         # 5, 10, 15, 20 moves access the prediction tool on those players
 
-        random.shuffle(self.opponents)
+        #random.shuffle(self.opponents)
 
         print(self.opponents, self.user_color, "to see if we can access it here,")
         print("predict button")
-        self.label_2.setText(self.opponents[0])  # first color player
-        self.label_3.setText(self.opponents[1])
-        self.label_4.setText(self.opponents[2])
-        self.label_5.setText(self.opponents[0])  # second color
-        self.label_6.setText(self.opponents[1])
-        self.label_7.setText(self.opponents[2])
-        self.label_8.setText(self.opponents[0])  # third color
-        self.label_9.setText(self.opponents[1])
-        self.label_10.setText(self.opponents[2])
+        self.label_2.setText(self.opponents[0]+"   "+str(round(predicted[0][0][0]*100,2))+"%")  # first color player
+        self.label_3.setText(self.opponents[1]+"   "+str(round(predicted[0][0][1]*100,2))+"%")
+        self.label_4.setText(self.opponents[2]+"   "+str(round(predicted[0][0][2]*100,2))+"%")
+        self.label_5.setText(self.opponents[0]+"   "+str(round(predicted[1][0][0]*100,2))+"%")  # second color
+        self.label_6.setText(self.opponents[1]+"   "+str(round(predicted[1][0][1]*100,2))+"%")
+        self.label_7.setText(self.opponents[2]+"   "+str(round(predicted[1][0][2]*100,2))+"%")
+        self.label_8.setText(self.opponents[0]+"   "+str(round(predicted[2][0][0]*100,2))+"%")  # third color
+        self.label_9.setText(self.opponents[1]+"   "+str(round(predicted[2][0][1]*100,2))+"%")
+        self.label_10.setText(self.opponents[2]+"   "+str(round(predicted[2][0][2]*100,2))+"%")
         list_of_labels_of_players = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
                                      self.label_8, self.label_9, self.label_10]
         for i in list_of_labels_of_players:
@@ -450,11 +456,18 @@ class ConfirmDialog(QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
-
+import sys
+import os
+os.chdir('../')
+app = QtWidgets.QApplication(sys.argv)
+ui = UiMainWindow()
+ui.show()
+sys.exit(app.exec_())
 # Starting the application.
-if __name__ == "__main__":
+"""if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = UiMainWindow()
     ui.show()
     sys.exit(app.exec_())
+"""
