@@ -35,6 +35,7 @@ class UiMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.opponents = None
         self.setObjectName("MainWindow")
         self.resize(800, 600)
         self.setWindowTitle("4-player Chess predictor")
@@ -105,7 +106,6 @@ class UiMainWindow(QMainWindow):
 
         self.setCentralWidget(self.centralwidget)
 
-
     def get_info_about_game(self):
         """
         Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
@@ -136,7 +136,7 @@ class UiMainWindow(QMainWindow):
         # Checking if we have three different players so we are sending the data through to the confirmation.
         if number == 3:
             self.opponents = [p1, p2, p3]
-            self.opponents = list(dict.fromkeys(self.opponents))
+            #self.opponents = list(dict.fromkeys(self.opponents))
             print(self.opponents)
             print(len(self.opponents))
 
@@ -152,8 +152,15 @@ class UiMainWindow(QMainWindow):
 
             else:
                 print("Cancel!")
+
         else:
             print("Oops, something is wrong.")
+            # emptying the field
+            self.player1.setText("")
+            self.player2.setText("")
+            self.player3.setText("")
+
+
 
     def opponents_color(self):
         """
@@ -275,10 +282,10 @@ class UiMainWindow(QMainWindow):
         self.info_text.setFont(QtGui.QFont("Arial", 11))
 
         # This is the field where the user add moves and being saved in the prediction list.
-        self.lineEdit1 = QtWidgets.QLineEdit(self.centralwidget)
-        self.lineEdit1.setGeometry(QtCore.QRect(120, 370, 451, 41))
-        self.lineEdit1.setObjectName("lineEdit")
-        self.lineEdit1.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
+        self.add_moves_lineedit = QtWidgets.QLineEdit(self.centralwidget)
+        self.add_moves_lineedit.setGeometry(QtCore.QRect(120, 370, 451, 41))
+        self.add_moves_lineedit.setObjectName("lineEdit")
+        self.add_moves_lineedit.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
 
         self.add_moves_button = QtWidgets.QPushButton(self.centralwidget)
         self.add_moves_button.setGeometry(QtCore.QRect(630, 380, 131, 23))
@@ -322,9 +329,9 @@ class UiMainWindow(QMainWindow):
         # This group is being repeated 3 times. The whole group is then repeated
         # again but without the space or the comma in the end.
 
-        if re.fullmatch(f'{moves}', self.lineEdit1.text()):
+        if re.fullmatch(f'{moves}', self.add_moves_lineedit.text()):
             print(self.moves_list_prediction, "before add")
-            self.moves_list_prediction.append([self.lineEdit1.text().replace(", ", " ").replace(",", " ")])
+            self.moves_list_prediction.append([self.add_moves_lineedit.text().replace(", ", " ").replace(",", " ")])
             print(self.moves_list_prediction, "after add")
             # maybe here and or to include the players dropping with a 0?
 
@@ -337,7 +344,7 @@ class UiMainWindow(QMainWindow):
             self.history_of_moves = ""
 
         # have to clear the label window
-        self.lineEdit1.clear()
+        self.add_moves_lineedit.clear()
         # print(self.movesListForPrediction) # this list is for Henrik
 
     def changed_history(self):
