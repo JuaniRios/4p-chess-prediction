@@ -61,6 +61,7 @@ class UiMainWindow(QMainWindow):
         self.welcome_text.setDisabled(True)
         self.welcome_text.setFont(QtGui.QFont("Arial", 12))
 
+        # Label for inserting the players
         self.label_inserting_p1 = QtWidgets.QLabel(self.centralwidget)
         self.label_inserting_p1.setGeometry(QtCore.QRect(30, 200, 47, 13))
         self.label_inserting_p1.setObjectName("label")
@@ -76,11 +77,13 @@ class UiMainWindow(QMainWindow):
         self.label_inserting_p3.setObjectName("label_3")
         self.label_inserting_p3.setText("Player 3")
 
+        # Label for the user color
         self.label_color = QtWidgets.QLabel(self.centralwidget)
         self.label_color.setGeometry(QtCore.QRect(520, 200, 221, 16))
         self.label_color.setObjectName("label_4")
         self.label_color.setText("Which color are you?")
 
+        # Choosing what color the user has
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
         self.comboBox.setGeometry(QtCore.QRect(660, 200, 69, 22))
         self.comboBox.setObjectName("comboBoxColor")
@@ -89,6 +92,7 @@ class UiMainWindow(QMainWindow):
         self.comboBox.addItem("Yellow")
         self.comboBox.addItem("Green")
 
+        # Accessing the list of players to later add them to the three input fields.
         list_of_players = get_player()
         self.player1 = QtWidgets.QLineEdit(self.centralwidget)
         self.player1.setGeometry(QtCore.QRect(110, 200, 113, 20))
@@ -104,6 +108,10 @@ class UiMainWindow(QMainWindow):
         self.player3.setGeometry(QtCore.QRect(110, 340, 113, 20))
         self.player3.setObjectName("player3")
         self.player3.setCompleter(QCompleter(list_of_players))
+
+        # Label for if the user does something wrong when inserting the players
+        self.label_when_wrong = QtWidgets.QLabel(self.centralwidget)
+        self.label_when_wrong.setGeometry(QtCore.QRect(30, 450, 113, 20))
 
         self.setCentralWidget(self.centralwidget)
 
@@ -137,25 +145,25 @@ class UiMainWindow(QMainWindow):
         # Checking if we have three different players so we are sending the data through to the confirmation.
         if number == 3:
             self.opponents = [p1, p2, p3]
-            #self.opponents = list(dict.fromkeys(self.opponents))
-            print(self.opponents)
-            print(len(self.opponents))
 
             # Here is the confirm dialog, just to make sure he inserted the right thing before sending it to the
             # training model.
             dlg = ConfirmDialog(self.opponents, self.user_color)
             if dlg.exec():
-
-                # henrik function(self.opponents, self.user_color) # what do we return from here?
+                # If we have an "OK"
                 print("Success!")
-                print(self.opponents, self.user_color, "to henrik")
+                # Opening the second window
                 self.window2()
 
             else:
+                # Else we go back to window1 in case he wanted to change something
                 print("Cancel!")
 
         else:
             print("Oops, something is wrong.")
+            # creating a label to inform the user that something went wrong with the users.
+            self.label_when_wrong.setText("Ooops something is wrong, check spelling and that there is different players.")
+            self.label_when_wrong.adjustSize()
             # emptying the field
             self.player1.setText("")
             self.player2.setText("")
@@ -163,20 +171,7 @@ class UiMainWindow(QMainWindow):
 
 
 
-    def opponents_color(self):
-        """
-        This function takes in what color the user has inserted and changes the colors displayed on window 2 later,
-        to understand better which player is which.
 
-        """
-
-        # if confirm then make the colors.
-        self.colors = ["Red", "Blue", "Yellow", "Green"]
-        # deleting the color the user has inserted to set the style with the other.
-        self.colors.remove(self.user_color)
-        self.first_color.setStyleSheet(f"background-color: {self.colors[0]}")
-        self.second_color.setStyleSheet(f"background-color: {self.colors[1]}")
-        self.third_color.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def window2(self):
         """
@@ -186,8 +181,8 @@ class UiMainWindow(QMainWindow):
 
         """
 
-        print(self.opponents, "checking if players are coming into window")
-        # print(self.player1.currentText(), self.player2.currentText(), self.player3.currentText())
+        #print(self.opponents, "checking if players are coming into window")
+
         self.history_of_moves = ""
         self.moves_list_prediction = []
         self.centralwidget = QtWidgets.QWidget()
@@ -214,61 +209,62 @@ class UiMainWindow(QMainWindow):
 
         # THE PREDICTION OF THE FIRST PLAYER
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
-        self.label_2.setGeometry(QtCore.QRect(120, 140, 47, 13))
+        self.label_2.setGeometry(QtCore.QRect(110, 140, 47, 13))
         self.label_2.setObjectName("label_2")
         self.label_2.setText(self.player1.text())
         self.label_2.adjustSize()
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
-        self.label_3.setGeometry(QtCore.QRect(120, 160, 47, 13))
+        self.label_3.setGeometry(QtCore.QRect(110, 160, 47, 13))
         self.label_3.setObjectName("label_3")
         self.label_3.setText(self.player2.text())
         self.label_3.adjustSize()
 
         self.label_4 = QtWidgets.QLabel(self.centralwidget)
-        self.label_4.setGeometry(QtCore.QRect(120, 180, 47, 13))
+        self.label_4.setGeometry(QtCore.QRect(110, 180, 47, 13))
         self.label_4.setObjectName("label_4")
         self.label_4.setText(self.player3.text())
         self.label_4.adjustSize()
 
         # THE PREDICTION OF THE SECOND PLAYER
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
-        self.label_5.setGeometry(QtCore.QRect(370, 140, 47, 13))
+        self.label_5.setGeometry(QtCore.QRect(360, 140, 47, 13))
         self.label_5.setObjectName("label_5")
         self.label_5.setText(self.player1.text())
         self.label_5.adjustSize()
 
         self.label_6 = QtWidgets.QLabel(self.centralwidget)
-        self.label_6.setGeometry(QtCore.QRect(370, 160, 47, 13))
+        self.label_6.setGeometry(QtCore.QRect(360, 160, 47, 13))
         self.label_6.setObjectName("label_6")
         self.label_6.setText(self.player2.text())
         self.label_6.adjustSize()
 
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(370, 180, 47, 13))
+        self.label_7.setGeometry(QtCore.QRect(360, 180, 47, 13))
         self.label_7.setObjectName("label_7")
         self.label_7.setText(self.player3.text())
         self.label_7.adjustSize()
 
         # THE PREDICTION OF THE THIRD PLAYER
         self.label_8 = QtWidgets.QLabel(self.centralwidget)
-        self.label_8.setGeometry(QtCore.QRect(620, 140, 47, 13))
+        self.label_8.setGeometry(QtCore.QRect(610, 140, 47, 13))
         self.label_8.setObjectName("label_8")
         self.label_8.setText(self.player1.text())
         self.label_8.adjustSize()
 
         self.label_9 = QtWidgets.QLabel(self.centralwidget)
-        self.label_9.setGeometry(QtCore.QRect(620, 160, 47, 13))
+        self.label_9.setGeometry(QtCore.QRect(610, 160, 47, 13))
         self.label_9.setObjectName("label_9")
         self.label_9.setText(self.player2.text())
         self.label_9.adjustSize()
 
         self.label_10 = QtWidgets.QLabel(self.centralwidget)
-        self.label_10.setGeometry(QtCore.QRect(620, 180, 47, 13))
+        self.label_10.setGeometry(QtCore.QRect(610, 180, 47, 13))
         self.label_10.setObjectName("label_10")
         self.label_10.setText(self.player3.text())
         self.label_10.adjustSize()
 
+        # Info text to the user how to insert moves
         self.info_text = QtWidgets.QTextEdit(self.centralwidget)
         self.info_text.setGeometry(QtCore.QRect(70, 220, 630, 140))
         self.info_text.setObjectName("lineEdit")
@@ -304,6 +300,7 @@ class UiMainWindow(QMainWindow):
         self.change_history_button .setText("Change history")
         self.change_history_button .clicked.connect(self.changed_history)
 
+        # This is the prediction button, where we train the model.
         self.predict_pushbutton = QtWidgets.QPushButton(self.centralwidget)
         self.predict_pushbutton.setGeometry(QtCore.QRect(650, 560, 70, 30))
         self.predict_pushbutton.setText("predict")
@@ -313,6 +310,21 @@ class UiMainWindow(QMainWindow):
         # changing the background to visualize which color is where depending on order.
         # here we are setting the visualisation with the three color user is not.
         self.opponents_color()
+
+    def opponents_color(self):
+        """
+        This function takes in what color the user has inserted and changes the colors displayed on window 2 later,
+        to understand better which player is which.
+
+        """
+
+        # if confirm then make the colors.
+        self.colors = ["Red", "Blue", "Yellow", "Green"]
+        # deleting the color the user has inserted to set the style with the other.
+        self.colors.remove(self.user_color)
+        self.first_color.setStyleSheet(f"background-color: {self.colors[0]}")
+        self.second_color.setStyleSheet(f"background-color: {self.colors[1]}")
+        self.third_color.setStyleSheet(f"background-color: {self.colors[2]}")
 
     def add_moves(self):
         """This functions adds the moves, for now to a string, to later add them to the prediction
@@ -361,6 +373,7 @@ class UiMainWindow(QMainWindow):
         if self.change_history_button.text() == "confirm changes":
             self.historyText.setDisabled(True)
 
+            # accessing the history text
             self.history_of_moves = self.historyText.toPlainText()
             splitting_data = self.history_of_moves.split(",")
             new_list = []
@@ -450,7 +463,7 @@ class ConfirmDialog(QDialog):
         message = (
             f"player 1 = {self.player_list[0]}, player2 = {self.player_list[1]}, player3 = {self.player_list[2]}, "
             f"your color is = {self.userColor}")
-        print(message)
+
         message = QtWidgets.QLabel(message)
         self.layout.addWidget(message)
         self.layout.addWidget(self.buttonBox)
