@@ -40,6 +40,20 @@ def read_data(players_list):
     return df
 
 
+def split_player(moves):
+    player_moves = {0: [], 1: [], 2: []}
+
+    for m in moves:
+        list_moves = m[0].split(" ")
+        for i, move in enumerate(list_moves):
+            player_moves[i] += [move]
+
+    player_moves = list(player_moves.values())
+    output = [" ".join(x) for x in player_moves]
+
+    return output
+
+
 def data_preprocessing(dataframe, players, n_rounds):
     '''
     Creates categorical encoding for the dependent variable based on
@@ -225,7 +239,7 @@ def interface_call(players, moves, n_moves):
     '''
 
     final_model, tokenizer, max_len = finalize_model(players, n_moves)
-
-    predictions = model_predict(final_model, moves, tokenizer, max_len)
+    list_moves = split_player(moves)
+    predictions = model_predict(final_model, list_moves, tokenizer, max_len)
 
     return predictions
