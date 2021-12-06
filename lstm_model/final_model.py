@@ -1,29 +1,19 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from tensorflow import keras
-from tensorflow.keras.layers import Concatenate, Input, Dense, Embedding, LSTM, SpatialDropout1D, Dropout
+from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, SpatialDropout1D, Dropout
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.utils import class_weight
 
-from sklearn.metrics import confusion_matrix, multilabel_confusion_matrix, ConfusionMatrixDisplay
-
 import warnings
-
 
 def warn(*args, **kwargs):
     pass
-
-
-
 warnings.warn = warn
-
-plt.rcParams["figure.figsize"] = (15, 8)
 
 
 
