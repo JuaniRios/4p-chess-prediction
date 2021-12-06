@@ -1,6 +1,6 @@
-from filter_data import filter_data
-from data_manipulation import mk_move
-from to_hdf import to_hdf
+from data_cleaning.filter_data import filter_data
+from data_cleaning.data_manipulation import mk_move
+from data_cleaning.to_hdf import to_hdf
 
 
 def txt_to_h5(file_name):

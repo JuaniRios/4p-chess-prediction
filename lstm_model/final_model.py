@@ -33,10 +33,10 @@ def read_data(players_list):
     :return: dataframe with data of 3 players
     '''
 
-    if not os.path.exists("../data_set.h5"):
+    if not os.path.exists("./data_set.h5"):
         txt_to_h5("data_set.txt")
 
-    df = pd.read_hdf("../data_set.h5", where=f'"player" = {players_list}')
+    df = pd.read_hdf("./data_set.h5", where=f'"player" = {players_list}')
     return df
 
 

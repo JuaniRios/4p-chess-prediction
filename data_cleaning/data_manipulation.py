@@ -15,7 +15,7 @@ def add_dropped_active(chess_data):
     to keep track of the dropped and still active players within a game. Hence, dropped_players = [] and
     active_players = [1, 2, 3, 4] at the beginning of each game. They will be manipulated while a game is being
     processed.'''
-    for g in chess_data["data"]:
+    for g in chess_data:
         g["dropped_players"] = []
         g["active_players"] = [1, 2, 3, 4]
     return chess_data
@@ -247,11 +247,11 @@ def perform_castling(board, castling_move, player_nr):
 def mk_move(games):
     # this function will track the moves and update the board each round
     # it also keeps track of active and dropped players and gives the input to the castling function
-    for g in games["data"]: # go through each game
+    for g in games: # go through each game
         board = initial_board()  # construct new board at the beginning of each game
         #if game['data'].index(g) < 15915:
         #    continue
-        print(f"{round(games['data'].index(g)/len(games['data'])*100, 1)}%")  # print game number
+        print(f"{round(games.index(g)/len(games)*100, 1)}%")  # print game number
         # at the start of each game, all the players are active and none has dropped
         g["active_players"] = [1,2,3,4]
         g["dropped_players"] = []
