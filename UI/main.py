@@ -152,8 +152,15 @@ class UiMainWindow(QMainWindow):
 
             else:
                 print("Cancel!")
+
         else:
             print("Oops, something is wrong.")
+            # emptying the field
+            self.player1.setText("")
+            self.player2.setText("")
+            self.player3.setText("")
+
+
 
     def opponents_color(self):
         """

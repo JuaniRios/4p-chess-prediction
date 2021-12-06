@@ -17,6 +17,16 @@ def app(qtbot):
     return ui
 
 
+#CONFIRMWINDOW
+@pytest.fixture
+def dialog(qtbot):
+    dialog = main.ConfirmDialog()
+    qtbot.addWidget(dialog)
+
+    return dialog
+
+
+
 def test_label_first_window(app, players):
     assert app.label_inserting_p1.text() == "Player 1"
     assert app.label_inserting_p2.text() == "Player 2"
@@ -47,12 +57,16 @@ def test_get_info_about_game_cancel(app, qtbot, players):
     app.player1.setText(players[0])
     app.player2.setText(players[0])
     app.player3.setText(players[2])
+    app.comboBox.setCurrentText("Yellow")
     qtbot.mouseClick(app.submit_button, QtCore.Qt.LeftButton)
 
-    assert app.opponents == None
     # Making sure we are still on the first window.
     assert app.label_inserting_p1.text() == "Player 1"
     assert app.label_inserting_p2.text() == "Player 2"
+    # checking that the players did not get saved in the opponents list.
+    assert app.opponents == None
+    assert app.player1.text() == ""
+
 
 def test_opponents_color(app, qtbot, players):
     pass
@@ -102,6 +116,7 @@ def test_add_moves(app, qtbot, players):
     app.add_moves_lineedit.setText(try_move3)
     qtbot.mouseClick(app.add_moves_button, QtCore.Qt.LeftButton)
     assert app.historyText.toPlainText() != try_move3+","
+    assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
     # checking that the list of lists is updated!
     assert app.moves_list_prediction == [[try_move1], [try_move2]]
     assert app.moves_list_prediction != [[try_move1], [try_move2], [try_move3]]
