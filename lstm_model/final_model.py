@@ -49,7 +49,7 @@ def split_player(moves):
             player_moves[i] += [move]
 
     player_moves = list(player_moves.values())
-    output = [" ".join(x) for x in player_moves]
+    output = [[" ".join(x)] for x in player_moves]
 
     return output
 
