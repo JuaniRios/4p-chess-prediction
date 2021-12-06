@@ -35,6 +35,7 @@ class UiMainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.opponents = None
         self.setObjectName("MainWindow")
         self.resize(800, 600)
         self.setWindowTitle("4-player Chess predictor")
@@ -105,7 +106,6 @@ class UiMainWindow(QMainWindow):
 
         self.setCentralWidget(self.centralwidget)
 
-
     def get_info_about_game(self):
         """
         Get information about the game, after the user has confirmed the Dialog, to use it for the training of the model
@@ -136,7 +136,7 @@ class UiMainWindow(QMainWindow):
         # Checking if we have three different players so we are sending the data through to the confirmation.
         if number == 3:
             self.opponents = [p1, p2, p3]
-            self.opponents = list(dict.fromkeys(self.opponents))
+            #self.opponents = list(dict.fromkeys(self.opponents))
             print(self.opponents)
             print(len(self.opponents))
 
