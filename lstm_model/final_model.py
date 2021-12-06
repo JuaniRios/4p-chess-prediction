@@ -1,18 +1,25 @@
-import pandas as pd
+import warnings
+import os
+
 import numpy as np
+import pandas as pd
+from sklearn.utils import class_weight
 from tensorflow import keras
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, SpatialDropout1D, Dropout
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.callbacks import EarlyStopping
-from sklearn.utils import class_weight
 
-import warnings
+from data_cleaning.main import txt_to_h5
+
+
 
 def warn(*args, **kwargs):
     pass
+
+
 warnings.warn = warn
 
 
@@ -26,7 +33,10 @@ def read_data(players_list):
     :return: dataframe with data of 3 players
     '''
 
-    df = pd.read_hdf("fulldata.h5", where=f'"player" = {players_list}')
+    if not os.path.exists("../data_set.h5"):
+        txt_to_h5("data_set.txt")
+
+    df = pd.read_hdf("../data_set.h5", where=f'"player" = {players_list}')
     return df
 
 
@@ -107,7 +117,6 @@ def embedding_presets(X_train, max_len):
     return X_train, tokenizer, word_index
 
 
-
 def get_class_weights(y_train):
     '''
     Get class weights to combat imbalance issues with predictions
@@ -122,7 +131,6 @@ def get_class_weights(y_train):
     class_weights = dict(enumerate(class_weights))
 
     return class_weights
-
 
 
 def train_model(X_train, y_train, class_weights, word_index, max_len):
@@ -165,7 +173,6 @@ def train_model(X_train, y_train, class_weights, word_index, max_len):
                         callbacks=[EarlyStopping(monitor='val_loss', patience=4, min_delta=0.0001)])
 
     return model
-
 
 
 def model_predict(model, player_moves, tokenizer, max_len):
@@ -216,7 +223,6 @@ def interface_call(players, moves, n_moves):
     :param user_color:
     :return:
     '''
-
 
     final_model, tokenizer, max_len = finalize_model(players, n_moves)
 

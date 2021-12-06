@@ -51,7 +51,7 @@ def to_hdf(data):
     df.columns = df.columns.astype(str)
     df = df.replace({"..":"0"})
 
-    df.to_hdf("test.h5",key='df', mode='w', format='t', data_columns=True)
+    df.to_hdf("data_set.h5",key='df', mode='w', format='t', data_columns=True)
     print("Writing finished")
 
     return

@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+./large_files/solo_pretty.json
+./large_files/solo (1).txt
