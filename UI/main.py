@@ -59,7 +59,7 @@ class UiMainWindow(QMainWindow):
                                   "which colour you are playing with in this game. Please notice that all the three "
                                   "players have to exist in our data for this to work. If you entered players wrongly, "
                                   "then you will not proceed to the next window. If there is no suggestion for a player"
-                                  ", then the player do not exist in our data or you might have misspelled the player.")
+                                  ", then the player does not exist in our data or you might have misspelled the player.")
         self.welcome_text.setDisabled(True)
         self.welcome_text.setFont(QtGui.QFont("Arial", 12))
 
@@ -267,9 +267,9 @@ class UiMainWindow(QMainWindow):
         self.info_text = QtWidgets.QTextEdit(self.centralwidget)
         self.info_text.setGeometry(QtCore.QRect(70, 220, 630, 140))
         self.info_text.setObjectName("lineEdit")
-        self.info_text.setText("Here you have to add four moves per round, so one move per player. The accepted moves "
-                               "are setting which piece following with where it is moving on the board.\nIf a player has "
-                               "dropped out replace his turn with a '0'."
+        self.info_text.setText("Here you have to add three moves per round, so one move per opposing player. The "
+                               "accepted moves are setting which piece following with where it is moving on the board."
+                               "\nIf a player has dropped out replace his turn with a '0'."
                                "\n\nExample:"
                                "Qa2-Qb4 g4-g6 b2-b1"
                                "\nExample: 'a2-a3 Qb5-b7 0'\nIf you wants to change the history, press"
@@ -281,7 +281,7 @@ class UiMainWindow(QMainWindow):
         self.add_moves_lineedit = QtWidgets.QLineEdit(self.centralwidget)
         self.add_moves_lineedit.setGeometry(QtCore.QRect(120, 370, 451, 41))
         self.add_moves_lineedit.setObjectName("lineEdit")
-        self.add_moves_lineedit.setPlaceholderText("Qa1-b3 h12-g8 b4-b44")
+        self.add_moves_lineedit.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
 
         self.add_moves_button = QtWidgets.QPushButton(self.centralwidget)
         self.add_moves_button.setGeometry(QtCore.QRect(630, 380, 131, 23))
