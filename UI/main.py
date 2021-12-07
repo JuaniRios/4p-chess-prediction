@@ -272,7 +272,7 @@ class UiMainWindow(QMainWindow):
                                "dropped out replace his turn with a '0'."
                                "\n\nExample:"
                                "Qa2-Qb4 g4-g6 b2-b1"
-                               "\nExample: 'a2-a3 a1-a2 Qb5-Qb7 0'\nIf you wants to change the history, press"
+                               "\nExample: 'a2-a3 Qb5-b7 0'\nIf you wants to change the history, press"
                                "the button and change the mistake")
         self.info_text.setDisabled(True)
         self.info_text.setFont(QtGui.QFont("Arial", 11))
@@ -281,7 +281,7 @@ class UiMainWindow(QMainWindow):
         self.add_moves_lineedit = QtWidgets.QLineEdit(self.centralwidget)
         self.add_moves_lineedit.setGeometry(QtCore.QRect(120, 370, 451, 41))
         self.add_moves_lineedit.setObjectName("lineEdit")
-        self.add_moves_lineedit.setPlaceholderText("Qa1-Qb3 h12-g8 a1-a12 b4-b44")
+        self.add_moves_lineedit.setPlaceholderText("Qa1-b3 h12-g8 b4-b44")
 
         self.add_moves_button = QtWidgets.QPushButton(self.centralwidget)
         self.add_moves_button.setGeometry(QtCore.QRect(630, 380, 131, 23))

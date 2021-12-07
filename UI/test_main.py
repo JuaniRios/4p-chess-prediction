@@ -157,9 +157,10 @@ def test_add_moves(app, qtbot, players):
     app.player3.setText(players[2])
     app.opponents = [app.player1, app.player2, app.player3]
     app.user_color = "Yellow"
-    try_move1 = "a1-a2 a1-a2 a1-a2 a1-a2"
-    try_move2 = "a1-a2 Qf5-Qd3 0 0"
-    try_move3 = "a1-a2 a1-a2 a1-a2 aaaaaaa"
+    try_move1 = "a1-a2 a1-a2 a1-a2"
+    try_move2 = "a1-a2 Qf5-Qd3 0"
+    # testing if we are adding a really wrong move
+    try_move3 = "aqw2-Qw2 0 wkd-w"
 
     app.window2()
 
@@ -177,6 +178,7 @@ def test_add_moves(app, qtbot, players):
     assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
 
     # checking what is happening when entering a wrong move.
+    # that is not added to the history text
     app.add_moves_lineedit.setText(try_move3)
     qtbot.mouseClick(app.add_moves_button, QtCore.Qt.LeftButton)
     assert app.historyText.toPlainText() != try_move3+","
@@ -201,9 +203,9 @@ def test_change_history(app, qtbot, players):
     app.player3.setText(players[2])
     app.opponents = [app.player1, app.player2, app.player3]
     app.user_color = "Yellow"
-    try_move1 = "a1-a2 a1-a2 a1-a2 a1-a2"
-    try_move2 = "a1-a2 Qf5-Qd3 0 0"
-    try_move3 = "0 0 0 Qa3-a2"
+    try_move1 = "a1-a2 a1-a2 a1-a2"
+    try_move2 = "a1-a2 Qf5-Qd3 0"
+    try_move3 = "0 0 Qa3-a2"
     app.window2()
     # adding a move
     app.add_moves_lineedit.setText(try_move1)
