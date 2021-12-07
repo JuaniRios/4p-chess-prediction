@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QDialog, QCompleter, QMainWindow
 
 import re
 from lstm_model import final_model
+import sys
+import os
 
 
 def get_player():
@@ -468,8 +470,6 @@ class ConfirmDialog(QDialog):
         self.layout.addWidget(self.buttonBox)
         self.setLayout(self.layout)
 
-import sys
-import os
 os.chdir('../')
 app = QtWidgets.QApplication(sys.argv)
 ui = UiMainWindow()

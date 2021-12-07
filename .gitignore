@@ -9,6 +9,8 @@ __pycache__/
 # H5, txt
 *.h5
 *.txt
+*.docx
+*.json
 
 # Distribution / packaging
 .Python
