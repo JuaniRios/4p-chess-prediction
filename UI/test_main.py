@@ -20,6 +20,21 @@ def app(qtbot):
 
     return ui
 
+# making a fixture with information when trying some function on the second window
+@pytest.fixture
+def app_with_info(qtbot):
+    ui = main.UiMainWindow()
+    qtbot.addWidget(ui)
+    players = ["Mzambe", "Rasen555", "rook6431"]
+    ui.player1.setText(players[0])
+    ui.player2.setText(players[1])
+    ui.player3.setText(players[2])
+    ui.opponents = [ui.player1, ui.player2, ui.player3]
+    ui.user_color = "Yellow"
+    ui.window2()
+
+    return ui
+
 #
 # #CONFIRMWINDOW
 # @pytest.fixture
@@ -101,7 +116,7 @@ def test_get_info_about_game_cancel(app, qtbot, players):
     assert app.label_when_wrong.text() == "Ooops something is wrong, check spelling and that there is different players."
 
 
-def test_window2(app, qtbot, players):
+def test_window2(app_with_info, qtbot):
     """
     We are testing the window2 that we are accessing it. we are checking that three players
     are set as labels for visualisation as well we are checking that the right color is there.
@@ -111,20 +126,15 @@ def test_window2(app, qtbot, players):
     :param players:
     :return:
     """
-    app.player1.setText(players[0])
-    app.player2.setText(players[1])
-    app.player3.setText(players[2])
-    app.opponents = [app.player1, app.player2, app.player3]
-    app.user_color = "Yellow"
-    # opening the second window.
-    app.window2()
+    app = app_with_info
+
     # checking that the labels 2,5,8 for now is player 1
     assert app.label_2.text() and app.label_5.text() and app.label_8.text() == app.player1.text()
     # checking that the other are not player one from start.
     assert app.label_3.text() != app.player1.text()
     assert app.historyText.toPlainText() == ""
 
-def test_opponents_color(app, qtbot, players):
+def test_opponents_color(app_with_info, qtbot):
     """
     Checking that when the user submits the color, that we are deleting it from the list
     so that we later can see the visualisation of the other three colors.
@@ -133,15 +143,12 @@ def test_opponents_color(app, qtbot, players):
     :param players:
     :return:
     """
-    app.player1.setText(players[0])
-    app.player2.setText(players[0])
-    app.player3.setText(players[2])
-    app.user_color = "Yellow"
-    app.window2()
+    app = app_with_info
+
     # checking that the users color gets deleted before the visualisation windows.
     assert "Yellow" not in app.colors
 
-def test_add_moves(app, qtbot, players):
+def test_add_moves(app_with_info, qtbot):
     """
     We are checking that when the user is adding the right moves it is coming into the history field
     and when he is putting in the wrong format, it is not added to the field. we are also checking that
@@ -152,18 +159,11 @@ def test_add_moves(app, qtbot, players):
     :param players:
     :return:
     """
-    app.player1.setText(players[0])
-    app.player2.setText(players[0])
-    app.player3.setText(players[2])
-    app.opponents = [app.player1, app.player2, app.player3]
-    app.user_color = "Yellow"
+    app = app_with_info
     try_move1 = "a1-a2 a1-a2 a1-a2"
     try_move2 = "a1-a2 Qf5-Qd3 0"
     # testing if we are adding a really wrong move
     try_move3 = "aqw2-Qw2 0 wkd-w"
-
-    app.window2()
-
     assert app.label_2.text() == app.player1.text()
     assert app.predict_pushbutton.text() == "predict"
     app.add_moves_lineedit.setText(try_move1)
@@ -187,7 +187,7 @@ def test_add_moves(app, qtbot, players):
     assert app.moves_list_prediction == [[try_move1], [try_move2]]
     assert app.moves_list_prediction != [[try_move1], [try_move2], [try_move3]]
 
-def test_change_history(app, qtbot, players):
+def test_change_history(app_with_info, qtbot):
     """
     Here we are checking when there is something in the history field and the user
     would like to correct it, we are checking what the button is called, we are checking
@@ -198,15 +198,10 @@ def test_change_history(app, qtbot, players):
     :param players:
     :return:
     """
-    app.player1.setText(players[0])
-    app.player2.setText(players[0])
-    app.player3.setText(players[2])
-    app.opponents = [app.player1, app.player2, app.player3]
-    app.user_color = "Yellow"
+    app = app_with_info
     try_move1 = "a1-a2 a1-a2 a1-a2"
     try_move2 = "a1-a2 Qf5-Qd3 0"
-    try_move3 = "0 0 Qa3-a2"
-    app.window2()
+
     # adding a move
     app.add_moves_lineedit.setText(try_move1)
     qtbot.mouseClick(app.add_moves_button, QtCore.Qt.LeftButton)
@@ -228,8 +223,28 @@ def test_change_history(app, qtbot, players):
     assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
     assert app.historyText.toPlainText() != try_move1+","
 
-def test_predict_button(app, qtbot, players):
-    pass
+def test_predict_button(app_with_info, qtbot):
+    """
+    We are testing the predict button, we are first checking we have players on the second window,
+    then we are checking that we have a list of lists of moves to send, and then that we get in return
+    the list of list of predicted player and the percentage.
+
+    :param app_with_info:
+    :param qtbot:
+    :return:
+    """
+    app = app_with_info
+    # checking that the players are on the page
+    assert app.player1.text() == app.label_2.text() == app.label_5.text() == app.label_8.text()
+    assert app.player2.text() == app.label_3.text() == app.label_6.text() == app.label_9.text()
+    assert app.player3.text() == app.label_4.text() == app.label_7.text() == app.label_10.text()
+
+    # when pressing predict button, checking that we have a lists of lists of moves.
+    # and we are getting in return a list of lists of which player is predicted.
+    qtbot.mouseClick(app.predict_pushbutton, QtCore.Qt.LeftButton)
+    # here we have to check that players have changed the names and it has added a number to it.
+    # how do i access the  list, maybe can call it "self" something?
+
 
 def test_add_players(players):
     """
