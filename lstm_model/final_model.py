@@ -1,5 +1,5 @@
-import os
 import warnings
+import os
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,12 @@ def read_data(players_list):
     if not os.path.exists("./data_set.h5"):
         txt_to_h5("data_set.txt")
 
-    df = pd.read_hdf("./data_set.h5", where=f'"player" = {players_list}')
+    fpath = "./data_set.h5"
+    df = read_from_hdf(players_list, fpath)
+    return df
+
+def read_from_hdf(players_list, fpath):
+    df = pd.read_hdf(fpath, where=f'"player" = {players_list}')
     return df
 
 
