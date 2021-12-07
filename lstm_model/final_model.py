@@ -154,7 +154,7 @@ def get_class_weights(y_train):
     return class_weights
 
 
-def train_model(X_train, y_train, class_weights, word_index, max_len):
+def train_model(X_train, y_train, word_index, max_len, class_weights=None):
     '''
     Running the algorithm to train the model.
 
@@ -239,7 +239,10 @@ def finalize_model(players, n_rounds):
     X, labels = data_preprocessing(data, players, n_rounds)
     weights = get_class_weights(labels)
     X, tokenizer, word_index = embedding_presets(X, max_len)
-    model = train_model(X, labels, weights, word_index, max_len)
+    if len(weights) == 3:
+        model = train_model(X, labels, word_index, max_len, weights)
+    else:
+        model = train_model(X, labels, word_index, max_len)
 
     return model, tokenizer, max_len
 
