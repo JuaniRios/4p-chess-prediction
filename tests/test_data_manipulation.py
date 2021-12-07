@@ -1,6 +1,6 @@
 # this is the testing file, where all the functions of our Data Manipulation will be tested
 
-from data_manipulation import *
+from data_cleaning.data_manipulation import *
 import pytest
 import random
 
