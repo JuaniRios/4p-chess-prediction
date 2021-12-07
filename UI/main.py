@@ -3,7 +3,6 @@ from PyQt5.QtWidgets import QDialog, QCompleter, QMainWindow
 
 import re
 from lstm_model import final_model
-import sys
 import os
 
 
@@ -118,6 +117,8 @@ class UiMainWindow(QMainWindow):
         self.label_when_wrong.setGeometry(QtCore.QRect(30, 450, 113, 20))
 
         self.setCentralWidget(self.centralwidget)
+
+        self.predicted = []
 
     def get_info_about_game(self):
         """
@@ -306,6 +307,8 @@ class UiMainWindow(QMainWindow):
         self.predict_pushbutton.setGeometry(QtCore.QRect(650, 560, 70, 30))
         self.predict_pushbutton.setText("predict")
         self.predict_pushbutton.clicked.connect(self.predict_players)
+        self.predict_pushbutton.setDisabled(True)
+
 
         self.setCentralWidget(self.centralwidget)
         # changing the background to visualize which color is where depending on order.
@@ -348,7 +351,10 @@ class UiMainWindow(QMainWindow):
             print(self.moves_list_prediction, "before add")
             self.moves_list_prediction.append([self.add_moves_lineedit.text().replace(", ", " ").replace(",", " ")])
             print(self.moves_list_prediction, "after add")
-
+            if len(self.moves_list_prediction) in [5, 10, 15, 20]:
+                self.predict_pushbutton.setDisabled(False)
+            else:
+                self.predict_pushbutton.setDisabled(True)
 
             for i in self.moves_list_prediction:
                 self.history_of_moves += "".join(i)
@@ -360,6 +366,7 @@ class UiMainWindow(QMainWindow):
 
         # have to clear the label window
         self.add_moves_lineedit.clear()
+
 
 
     def changed_history(self):
@@ -400,6 +407,10 @@ class UiMainWindow(QMainWindow):
 
             # making the window changeable
             self.historyText.setDisabled(False)
+        if len(self.moves_list_prediction) in [5,10,15,20]:
+            self.predict_pushbutton.setDisabled(False)
+        else:
+            self.predict_pushbutton.setDisabled(True)
 
     def predict_players(self):
         """
@@ -411,8 +422,11 @@ class UiMainWindow(QMainWindow):
         print(self.opponents)
         print(self.moves_list_prediction)
         print(len(self.moves_list_prediction))
-        predicted = final_model.interface_call(self.opponents, self.moves_list_prediction, len(self.moves_list_prediction))
-        print(predicted)
+        if type(self.opponents[0]) != str:
+            self.opponents = [x.text() for x in self.opponents]
+        self.predicted = final_model.interface_call(self.opponents, self.moves_list_prediction, len(self.moves_list_prediction))
+        print(self.predicted)
+
         #import random
 
         # 5, 10, 15, 20 moves access the prediction tool on those players
@@ -421,15 +435,15 @@ class UiMainWindow(QMainWindow):
 
         print(self.opponents, self.user_color, "to see if we can access it here,")
         print("predict button")
-        self.label_2.setText(self.opponents[0]+"   "+str(round(predicted[0][0][0]*100,2))+"%")  # first color player
-        self.label_3.setText(self.opponents[1]+"   "+str(round(predicted[0][0][1]*100,2))+"%")
-        self.label_4.setText(self.opponents[2]+"   "+str(round(predicted[0][0][2]*100,2))+"%")
-        self.label_5.setText(self.opponents[0]+"   "+str(round(predicted[1][0][0]*100,2))+"%")  # second color
-        self.label_6.setText(self.opponents[1]+"   "+str(round(predicted[1][0][1]*100,2))+"%")
-        self.label_7.setText(self.opponents[2]+"   "+str(round(predicted[1][0][2]*100,2))+"%")
-        self.label_8.setText(self.opponents[0]+"   "+str(round(predicted[2][0][0]*100,2))+"%")  # third color
-        self.label_9.setText(self.opponents[1]+"   "+str(round(predicted[2][0][1]*100,2))+"%")
-        self.label_10.setText(self.opponents[2]+"   "+str(round(predicted[2][0][2]*100,2))+"%")
+        self.label_2.setText(self.opponents[0]+"   "+str(round(self.predicted[0][0][0]*100,2))+"%")  # first color player
+        self.label_3.setText(self.opponents[1]+"   "+str(round(self.predicted[0][0][1]*100,2))+"%")
+        self.label_4.setText(self.opponents[2]+"   "+str(round(self.predicted[0][0][2]*100,2))+"%")
+        self.label_5.setText(self.opponents[0]+"   "+str(round(self.predicted[1][0][0]*100,2))+"%")  # second color
+        self.label_6.setText(self.opponents[1]+"   "+str(round(self.predicted[1][0][1]*100,2))+"%")
+        self.label_7.setText(self.opponents[2]+"   "+str(round(self.predicted[1][0][2]*100,2))+"%")
+        self.label_8.setText(self.opponents[0]+"   "+str(round(self.predicted[2][0][0]*100,2))+"%")  # third color
+        self.label_9.setText(self.opponents[1]+"   "+str(round(self.predicted[2][0][1]*100,2))+"%")
+        self.label_10.setText(self.opponents[2]+"   "+str(round(self.predicted[2][0][2]*100,2))+"%")
         list_of_labels_of_players = [self.label_2, self.label_3, self.label_4, self.label_5, self.label_6, self.label_7,
                                      self.label_8, self.label_9, self.label_10]
         for i in list_of_labels_of_players:
@@ -471,15 +485,14 @@ class ConfirmDialog(QDialog):
         self.setLayout(self.layout)
 
 os.chdir('../')
-app = QtWidgets.QApplication(sys.argv)
-ui = UiMainWindow()
-ui.show()
-sys.exit(app.exec_())
+#app = QtWidgets.QApplication(sys.argv)
+#ui = UiMainWindow()
+#ui.show()
+#sys.exit(app.exec_())
 # Starting the application.
-"""if __name__ == "__main__":
+if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     ui = UiMainWindow()
     ui.show()
     sys.exit(app.exec_())
-"""

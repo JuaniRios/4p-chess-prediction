@@ -1,7 +1,8 @@
+import os
+
 import pytest
 import main
 from PyQt5 import QtCore
-
 
 #### PROBLEM still is that the dialog is opening, we have to simulate that somehow.
 #### Will try with a new qt bot widget for tha dialog window.
@@ -9,7 +10,7 @@ from PyQt5 import QtCore
 list_all_players_available = main.get_player()
 @pytest.fixture
 def players():
-    players = ["Mzambe", "Rasen555", "rook6431"]
+    players = ["empty_K3", "sumat777", "vrdtmr"]
 
     return players
 
@@ -20,12 +21,17 @@ def app(qtbot):
 
     return ui
 
+@pytest.fixture
+def moves():
+    sample_moves = "h2-h3 b7-c7 m9-l9,Ne1-f3 Qa7-b7 m8-l8,Qg1-k5 Na5-c6 Qn8-m8,Bi1-h2 Qb7-d9 Nn5-l6,Nj1-i3 b11-d11 Qm8-l7"
+    return sample_moves
+
 # making a fixture with information when trying some function on the second window
 @pytest.fixture
 def app_with_info(qtbot):
     ui = main.UiMainWindow()
     qtbot.addWidget(ui)
-    players = ["Mzambe", "Rasen555", "rook6431"]
+    players = ["empty_K3", "sumat777", "vrdtmr"]
     ui.player1.setText(players[0])
     ui.player2.setText(players[1])
     ui.player3.setText(players[2])
@@ -58,7 +64,7 @@ def test_label_first_window(app, players):
     assert app.label_inserting_p2.text() == "Player 2"
     assert app.player1.text() == ""
     app.player1.setText(players[0])
-    assert app.player1.text() == "Mzambe"
+    assert app.player1.text() == "empty_K3"
 
 def test_get_info_about_game_confirm(app, qtbot, players):
     """
@@ -223,7 +229,7 @@ def test_change_history(app_with_info, qtbot):
     assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
     assert app.historyText.toPlainText() != try_move1+","
 
-def test_predict_button(app_with_info, qtbot):
+def test_predict_button(app_with_info, qtbot, moves):
     """
     We are testing the predict button, we are first checking we have players on the second window,
     then we are checking that we have a list of lists of moves to send, and then that we get in return
@@ -241,9 +247,17 @@ def test_predict_button(app_with_info, qtbot):
 
     # when pressing predict button, checking that we have a lists of lists of moves.
     # and we are getting in return a list of lists of which player is predicted.
+    qtbot.mouseClick(app.change_history_button, QtCore.Qt.LeftButton)
+    app.historyText.setText(moves)
+    qtbot.mouseClick(app.change_history_button, QtCore.Qt.LeftButton)
+
     qtbot.mouseClick(app.predict_pushbutton, QtCore.Qt.LeftButton)
-    # here we have to check that players have changed the names and it has added a number to it.
-    # how do i access the  list, maybe can call it "self" something?
+    # here we have to check that players have changed the names and it has the prediction to it.
+    # we do that by checking if the percent sign has been inserted to the labels.
+    assert "%" in app.label_2.text()
+    assert "%" in app.label_5.text()
+    assert "%" in app.label_8.text()
+
 
 
 def test_add_players(players):
