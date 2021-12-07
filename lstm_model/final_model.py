@@ -33,6 +33,7 @@ def read_data(players_list):
     :return: dataframe with data of 3 players
     '''
 
+    # if the .h5 does not exist, create the file from .txt file (one time)
     if not os.path.exists("./data_set.h5"):
         txt_to_h5("data_set.txt")
 
@@ -41,6 +42,10 @@ def read_data(players_list):
 
 
 def split_player(moves):
+    '''
+    Change the moves of move inputs from user in the UI to the correct format accepted by the model
+    :params moves: list of lists of string of moves for each round
+    '''
     player_moves = {0: [], 1: [], 2: []}
 
     for m in moves:
@@ -50,7 +55,7 @@ def split_player(moves):
 
     player_moves = list(player_moves.values())
     output = [[" ".join(x)] for x in player_moves]
-    print(output)
+
     return output
 
 
@@ -210,7 +215,19 @@ def model_predict(model, player_moves, tokenizer, max_len):
     return preds
 
 
+
 def finalize_model(players, n_rounds):
+    '''
+    Builds the pipeline of functions for the algorithm to train the model.
+        1. Query player data from .h5
+        2. Preprocess data
+        3. Get class weights to fix possible imbalanced classes
+        4. Tokenize the moves from data
+        5. Train the model
+
+        :param players: list of players in game
+        :param n_rounds: number of rounds with what to predict
+    '''
     max_len = 22
     data = read_data(players)
 
@@ -229,12 +246,12 @@ def interface_call(players, moves, n_moves):
     try:
         '''
         Function to start the pipeline:
-            1. Create evaluation model
-            2. Finalize model
-            3. returns the predictions in the correct format
+            1. Finalize model
+            2. Edit the moves added by user to a correct format for the model
+            3. Start prediction function that returns the predictions to the UI
     
-        :param players:
-        :param user_color:
+        :param players: list of players in the game
+        :param user_color: The color user is playing
         :return:
         '''
 
