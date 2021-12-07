@@ -16,9 +16,8 @@ from data_cleaning.main import txt_to_h5
 
 def warn(*args, **kwargs):
     pass
-
-
 warnings.warn = warn
+
 
 
 def read_data(players_list):
@@ -86,7 +85,6 @@ def data_preprocessing(dataframe, players, n_rounds):
 
     # selecting the correct column based whether user has entered 5,10,15 or 20 moves to moves list
     # for prediction.
-
     try:
         if n_rounds == 5:
             X = df_temp[["moves_5"]]
@@ -101,7 +99,6 @@ def data_preprocessing(dataframe, players, n_rounds):
             X = df_temp[["moves_20"]]
             y = df_temp["y"]
     except:
-        # TODO: create some kind of proper error for giving the wrong amount of games // do we want it or not?
         print("Wrong amount of moves given.")
         raise
 
@@ -122,20 +119,22 @@ def embedding_presets(X_train, max_len):
     :return:
     '''
 
-    # TODO: put most common parameters in a dictionary so we dont need to push them around with returns in functions
     n_most_common_words = 6000
 
-    # tokenize
+    # tokenize the words. This is to represent the strings as numerical format
     tokenizer = Tokenizer(num_words=n_most_common_words, lower=False, split=" ")
     tokenizer.fit_on_texts(X_train.iloc[:, 0].values)
     X_train_seq = tokenizer.texts_to_sequences(X_train.iloc[:, 0].values)
 
+    # create word dictionary
     word_index = tokenizer.word_index
     print('Found %s unique tokens.' % len(word_index))
 
+    #pad the sequences to pre-defined length
     X_train = pad_sequences(X_train_seq, maxlen=max_len)
 
     return X_train, tokenizer, word_index
+
 
 
 def get_class_weights(y_train):
@@ -143,11 +142,12 @@ def get_class_weights(y_train):
     Get class weights to combat imbalance issues with predictions
 
     :param y_train:
-    :return:
+    :return class_weights: a dictionary of class weights
     '''
 
     y_ints = [y.argmax() for y in y_train]
 
+    # use the class_weight module from sklearn.utils to calculate class weights
     class_weights = class_weight.compute_class_weight(class_weight='balanced', classes=np.unique(y_ints), y=y_ints)
     class_weights = dict(enumerate(class_weights))
 
@@ -165,8 +165,7 @@ def train_model(X_train, y_train, class_weights, word_index, max_len):
     :param max_len: max length of word embedding layer input
     :param X_test:  OPTIONAL
     :param y_test:
-    :return:
-
+    :return: Returns the trained model object
     '''
 
     # Setting parameters for model
@@ -174,18 +173,20 @@ def train_model(X_train, y_train, class_weights, word_index, max_len):
     emb_dim = 50
     batch_size = 32
 
-    # Running model
-    inp = Input(shape=(max_len))
-    embed = Embedding(len(word_index) + 1, emb_dim)(inp)
-    spatiald = SpatialDropout1D(0.4)(embed)
+    # Building the infrastructure for the model
+    inp = Input(shape=(max_len)) # define the input shape for training data
+    embed = Embedding(len(word_index) + 1, emb_dim)(inp) # define the word dictionary and embedding dimension parameters
+    spatiald = SpatialDropout1D(0.4)(embed) # spatial Dropout to prevent overfitting and reduce generalization error
     LSTM_Layer_1 = LSTM(64, dropout=0.3, return_sequences=False)(spatiald)
-    dense_layer_final = Dense(3, activation='softmax')(LSTM_Layer_1)
-    model = Model(inputs=inp, outputs=dense_layer_final)
+    dense_layer_final = Dense(3, activation='softmax')(LSTM_Layer_1) # using softmax function to change to probabilities
+    model = Model(inputs=inp, outputs=dense_layer_final) # define the inputs and outputs
 
+    # defining error metrics for training
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',
                   metrics=['acc'])
 
+    # starting the algorithm to train the model
     history = model.fit(x=X_train,
                         y=y_train,
                         epochs=epochs,
@@ -208,6 +209,8 @@ def model_predict(model, player_moves, tokenizer, max_len):
     '''
 
     preds = []
+
+    # for each player set of moves, tokenize the strings and use predict() function to append predictions
     for mov in player_moves:
         seq = tokenizer.texts_to_sequences(mov)
         padded = pad_sequences(seq, maxlen=max_len)
@@ -229,15 +232,13 @@ def finalize_model(players, n_rounds):
         :param players: list of players in game
         :param n_rounds: number of rounds with what to predict
     '''
+
     max_len = 22
+
     data = read_data(players)
-
     X, labels = data_preprocessing(data, players, n_rounds)
-
     weights = get_class_weights(labels)
-
     X, tokenizer, word_index = embedding_presets(X, max_len)
-
     model = train_model(X, labels, weights, word_index, max_len)
 
     return model, tokenizer, max_len
