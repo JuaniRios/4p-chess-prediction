@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.utils import class_weight
-from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, SpatialDropout1D, Dropout
 from tensorflow.keras.models import Sequential, Model
@@ -13,8 +12,6 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.utils import to_categorical
 
 from data_cleaning.main import txt_to_h5
-
-
 
 def warn(*args, **kwargs):
     pass
@@ -37,7 +34,12 @@ def read_data(players_list):
     if not os.path.exists("./data_set.h5"):
         txt_to_h5("data_set.txt")
 
-    df = pd.read_hdf("./data_set.h5", where=f'"player" = {players_list}')
+    fpath = "./data_set.h5"
+    df = read_from_hdf(players_list, fpath)
+    return df
+
+def read_from_hdf(players_list, fpath):
+    df = pd.read_hdf(fpath, where=f'"player" = {players_list}')
     return df
 
 
