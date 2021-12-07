@@ -31,11 +31,13 @@ def get_player():
 class UiMainWindow(QMainWindow):
     """
     Making the first window to the user, where he inserts the name of the players and which color he is using.
+    We are sending the inserted data to the "get_info_about_game" function, where if all correct it is sent to
+    the class dialog.
     """
 
     def __init__(self):
         super().__init__()
-
+        self.user_color = None
         self.opponents = None
         self.setObjectName("MainWindow")
         self.resize(800, 600)
@@ -180,9 +182,6 @@ class UiMainWindow(QMainWindow):
         the history of moves.
 
         """
-
-        #print(self.opponents, "checking if players are coming into window")
-
         self.history_of_moves = ""
         self.moves_list_prediction = []
         self.centralwidget = QtWidgets.QWidget()
@@ -347,7 +346,7 @@ class UiMainWindow(QMainWindow):
             print(self.moves_list_prediction, "before add")
             self.moves_list_prediction.append([self.add_moves_lineedit.text().replace(", ", " ").replace(",", " ")])
             print(self.moves_list_prediction, "after add")
-            # maybe here and or to include the players dropping with a 0?
+
 
             for i in self.moves_list_prediction:
                 self.history_of_moves += "".join(i)
@@ -359,7 +358,7 @@ class UiMainWindow(QMainWindow):
 
         # have to clear the label window
         self.add_moves_lineedit.clear()
-        # print(self.movesListForPrediction) # this list is for Henrik
+
 
     def changed_history(self):
         """

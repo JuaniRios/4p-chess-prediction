@@ -24,7 +24,7 @@ def app(qtbot):
 # #CONFIRMWINDOW
 # @pytest.fixture
 # def dialog(qtbot):
-#     dialog = main.ConfirmDialog()
+#     dialog = main.ConfirmDialog(["Mzambe", "Rasen555", "rook6431"], "Yellow")
 #     qtbot.addWidget(dialog)
 #
 #     return dialog
@@ -59,10 +59,15 @@ def test_get_info_about_game_confirm(app, qtbot, players):
     app.player1.setText(players[0])
     app.player2.setText(players[1])
     app.player3.setText(players[2])
+
     app.comboBox.setCurrentText("Yellow")
     qtbot.mouseClick(app.submit_button, QtCore.Qt.LeftButton)
     # here we have to simulate that we presses confirm!
     # and make a case if they press cancel also.
+
+
+
+    # we have to add the
 
     assert app.opponents == [app.player1.text(), app.player2.text(), app.player3.text()]
     assert app.user_color != "Red"
@@ -71,7 +76,7 @@ def test_get_info_about_game_confirm(app, qtbot, players):
     assert "Yellow" not in app.colors
     # Checking that we come to window 2
     assert app.add_moves_button.text() == "Add moves"
-    assert app.self.label_when_wrong == ""
+    assert app.label_when_wrong.text() == ""
 
 def test_get_info_about_game_cancel(app, qtbot, players):
     """
@@ -93,7 +98,8 @@ def test_get_info_about_game_cancel(app, qtbot, players):
     assert app.opponents == None
     assert app.player1.text() == ""
     # Checking that the info label is showing that something went wrong.
-    assert app.self.label_when_wrong == "Ooops something is wrong, check spelling and that there is different players."
+    assert app.label_when_wrong.text() == "Ooops something is wrong, check spelling and that there is different players."
+
 
 def test_window2(app, qtbot, players):
     """
@@ -119,15 +125,22 @@ def test_window2(app, qtbot, players):
     assert app.historyText.toPlainText() == ""
 
 def test_opponents_color(app, qtbot, players):
+    """
+    Checking that when the user submits the color, that we are deleting it from the list
+    so that we later can see the visualisation of the other three colors.
+    :param app:
+    :param qtbot:
+    :param players:
+    :return:
+    """
     app.player1.setText(players[0])
     app.player2.setText(players[0])
     app.player3.setText(players[2])
+    app.user_color = "Yellow"
     app.window2()
-    app.comboBox.setCurrentText("Yellow")
     # checking that the users color gets deleted before the visualisation windows.
     assert "Yellow" not in app.colors
 
-# is it only allowed with three moves now per round?
 def test_add_moves(app, qtbot, players):
     """
     We are checking that when the user is adding the right moves it is coming into the history field
@@ -191,20 +204,27 @@ def test_change_history(app, qtbot, players):
     try_move1 = "a1-a2 a1-a2 a1-a2 a1-a2"
     try_move2 = "a1-a2 Qf5-Qd3 0 0"
     try_move3 = "0 0 0 Qa3-a2"
-    app.moves_list_prediction = [[try_move1], [try_move2]]
+    app.window2()
+    # adding a move
+    app.add_moves_lineedit.setText(try_move1)
+    qtbot.mouseClick(app.add_moves_button, QtCore.Qt.LeftButton)
+
     # checking that the moves are in the history
-    assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
+    assert app.historyText.toPlainText() != try_move1+"," + try_move2+","
+    assert app.historyText.toPlainText() == try_move1+","
     # checking that the button is called change history
     assert app.change_history_button.text() == "Change history"
-    qtbot.mouseClick(app.changed_history(), QtCore.Qt.LeftButton)
+    qtbot.mouseClick(app.change_history_button, QtCore.Qt.LeftButton)
     # checking that after we click we are having button called confirm changes
     assert app.change_history_button.text() == "confirm changes"
-    app.historyText.setText(try_move2, try_move3)
-    qtbot.mouseClick(app.changed_history(), QtCore.Qt.LeftButton)
+    # changing the history
+    app.historyText.setText(try_move1+"," + try_move2+",")
+
+    qtbot.mouseClick(app.change_history_button, QtCore.Qt.LeftButton)
     # checking that we saved the data
     assert app.change_history_button.text() == "Change history"
-    assert app.historyText.toPlainText() != try_move1+"," + try_move2+","
-    assert app.historyText.toPlainText() == try_move2+"," + try_move3+","
+    assert app.historyText.toPlainText() == try_move1+"," + try_move2+","
+    assert app.historyText.toPlainText() != try_move1+","
 
 def test_predict_button(app, qtbot, players):
     pass
@@ -218,4 +238,4 @@ def test_add_players(players):
     assert players[1] in list_all_players_available
     assert players[2] in list_all_players_available
     assert players[0] != players[2]
-    assert "Nanna" not in list_all_players_available
+    assert "Fh-Krems" not in list_all_players_available
