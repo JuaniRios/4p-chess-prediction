@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from final_model import *
 
+
 @pytest.fixture
 def data():
     players_list = ["SirMullih", "Cha_ChaRealSmooth", "rojitto"]

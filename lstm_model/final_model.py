@@ -1,13 +1,12 @@
-import warnings
 import os
+import warnings
 
 import numpy as np
 import pandas as pd
 from sklearn.utils import class_weight
-from tensorflow import keras
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, SpatialDropout1D, Dropout
-from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Input, Dense, Embedding, LSTM, SpatialDropout1D
+from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.utils import to_categorical
@@ -15,13 +14,11 @@ from tensorflow.keras.utils import to_categorical
 from data_cleaning.main import txt_to_h5
 
 
-
 def warn(*args, **kwargs):
     pass
 
 
 warnings.warn = warn
-
 
 
 def read_data(players_list):
@@ -213,7 +210,6 @@ def model_predict(model, player_moves, tokenizer, max_len):
         preds.append(model.predict(padded))
 
     return preds
-
 
 
 def finalize_model(players, n_rounds):
