@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 import tensorflow
-from final_model import *
+from lstm_model.final_model import *
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def data():
     X_df, labels = data_preprocessing(df, players_list, n_rounds)
     weights = get_class_weights(labels)
     X, tokenizer, word_index = embedding_presets(X_df, max_len)
-    model = train_model(X, labels, weights, word_index, max_len)
+    model = train_model(X, labels, word_index, max_len, weights)
 
     return players_list, n_rounds, max_len, df, X_df, X, labels, weights, word_index, tokenizer, model
 
