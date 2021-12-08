@@ -4,13 +4,24 @@ import traceback
 
 
 def filter_data(file_str):
+    """
+    Convert the text file from chess.com describing all the games into a python dictionary.
+
+    Args:
+        file_str: name of the file
+
+    Returns: list of dictionaries (i.e games)
+
+    """
     try:
         with open(file_str) as f:
             content = f.read()
+            # Text file should have each line be a game, so we make a list of games by line splitting.
             games = content.splitlines()
             cleaned = []
             iteration = 0
             try:
+                # define helper functions to retrieve certain information
                 def get_param(name, pointer=0):
                     match = re.search(fr'\[{name} "([^"]*)', game[pointer:])
                     result = match.group(1)
@@ -24,7 +35,7 @@ def filter_data(file_str):
                     pointer += time.regs[0][1] - 1
                     return result, pointer
 
-                def get_move(pointer):
+                def get_move(pointer=0):
                     match = re.search(r'([a-z0-9A-Z-+=#]+) ', game[pointer:])
                     result = match.group(1)
                     pointer += match.regs[0][1] - 1
@@ -67,6 +78,7 @@ def filter_data(file_str):
 
                     return round, pointer, time2
 
+                # Where the magic happens. Iterate over the list of games and extract the data with the helper functions
                 for game in games:
                     iteration += 1
                     data = {}
@@ -130,6 +142,8 @@ def filter_data(file_str):
 
                     data["Duration"] = str(int((end_time - start_time).total_seconds()))
                     pointer = 0
+
+                    # Rounds are of undefined length, so do a loop until no more rounds exists in the game
                     while True:
                         round, pointer, time = get_round(pointer, n, start_time)
                         if not round:
@@ -137,6 +151,7 @@ def filter_data(file_str):
                         data["Rounds"] += [round]
                         n += 1
 
+                    # append the current extracted game to the result
                     cleaned.append(data)
 
                 return cleaned
@@ -147,4 +162,3 @@ def filter_data(file_str):
                 print(iteration)
     except Exception as Ex:
         print(Ex)
-
