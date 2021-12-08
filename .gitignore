@@ -136,3 +136,11 @@ dmypy.json
 
 ./large_files/solo_pretty.json
 ./large_files/solo (1).txt
+
+./large_files
+./build
+./dist
+./data_set.h5
+./data_set.txt
+./main.spec
+./tests/test_data_set.txt
