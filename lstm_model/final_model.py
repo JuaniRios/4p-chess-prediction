@@ -192,7 +192,7 @@ def train_model(X_train, y_train, word_index, max_len, class_weights=None):
                         epochs=epochs,
                         class_weight=class_weights,
                         batch_size=batch_size,
-                        callbacks=[EarlyStopping(monitor='val_loss', patience=4, min_delta=0.0001)])
+                        callbacks=[EarlyStopping(monitor='loss', patience=4, min_delta=0.0001)])
 
     return model
 
